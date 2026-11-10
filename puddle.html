@@ -1,0 +1,902 @@
+<title>Little Dragon's Bedtime Path</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@600;700;800&display=swap">
+<style>
+/* Layout: a moonlit storybook trail. The forest map is the hero on the left; the sum for the next stop sits on the right with three big answer stones. On a phone the map sits on top, shorter. */
+:root {
+  --bg: #101B2E;
+  --surface: #18263D;
+  --ink: #EAF0FA;
+  --muted: #A3B4CC;
+  --line: #2A3B57;
+  --grass: #1C3834;
+  --grass-2: #22443F;
+  --path: #5D5673;
+  --path-edge: #7C7396;
+  --tree: #2F6852;
+  --tree-deep: #224F3F;
+  --trunk: #5E4634;
+  --water: #2C5479;
+  --puddle: #6FA4E6;
+  --puddle-deep: #4B80C4;
+  --belly: #D8E6F7;
+  --eye: #101826;
+  --accent: #F4B860;
+  --accent-ink: #2A1A05;
+  --good: #82D6A3;
+  --try: #F29A82;
+  --badge: #8DB0F0;
+  --badge-ink: #0D1A2E;
+  --red: #D86A64;
+  --cream: #EFE4CC;
+  --cap: #9C6D45;
+  --glow: #F5DE6A;
+  --petal: #E6A0C0;
+  --berry: #9486EA;
+  --gold: #F5CF5C;
+  --moon: #F6EFC9;
+  --scale: #F2853A;
+  --tummy: #FBE2A0;
+  --nightcap: #7B8FE0;
+  --stripe: #EAF0FA;
+  --guard: #5FAABA;
+  --guard-deep: #43808F;
+  --guard-belly: #D3E9E2;
+  --fern: #6DB467;
+  --mouse: #BDB5CB;
+  --bunny: #E9E3F1;
+  --frog: #7CC07A;
+  --hog: #9C7657;
+  --face: #ECD7BA;
+  --owl: #A88B6A;
+  --fox: #E08A4E;
+  --bear: #9A7155;
+  --pink: #F2A9B8;
+  --veil: rgba(16, 27, 46, 0.95);
+  --font-display: "Fredoka", "Trebuchet MS", system-ui, sans-serif;
+  --font-body: "Nunito", "Segoe UI", system-ui, sans-serif;
+  color-scheme: dark;
+}
+/* This page commits to one night-time look in both themes, so there are no light or dark variants. */
+
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--ink);
+  font-family: var(--font-body); font-size: 1rem; line-height: 1.5;
+  padding-block: 18px 32px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+button { font-family: var(--font-body); }
+button:focus-visible { outline: 3px solid var(--badge); outline-offset: 2px; }
+.wrap { max-width: 1080px; margin: 0 auto; display: flex; flex-direction: column; gap: 16px; }
+
+.top { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 16px; }
+.top h1 { font: 700 clamp(1.6rem, 4vw, 2.3rem)/1.05 var(--font-display); margin: 0; text-wrap: balance; }
+.controls { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.icon-btn {
+  width: 46px; height: 46px; border-radius: 50%; border: 2px solid var(--line); background: var(--surface);
+  color: var(--muted); display: inline-grid; place-items: center; cursor: pointer; padding: 0;
+}
+.icon-btn svg { width: 24px; height: 24px; }
+.icon-btn[aria-pressed="true"] { color: var(--tree-deep); border-color: var(--tree); }
+.icon-btn[aria-pressed="true"] .slash { display: none; }
+.chip {
+  font-weight: 800; font-size: 0.95rem; color: var(--ink); background: var(--surface);
+  border: 2px solid var(--line); border-radius: 999px; padding: 9px 16px; cursor: pointer;
+}
+.chip.warn { border-color: var(--try); color: var(--try); }
+
+.stage { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: 18px; align-items: start; }
+@media (max-width: 860px) { .stage { grid-template-columns: minmax(0, 1fr); } }
+
+/* Map */
+.map { background: var(--grass); border-radius: 28px; overflow: hidden; display: flex; justify-content: center; }
+.map svg { width: 100%; height: auto; max-height: calc(100vh - 120px); display: block; }
+@media (max-width: 860px) { .map svg { max-height: 44vh; } }
+.trail-edge { fill: none; stroke: var(--path-edge); stroke-width: 34; stroke-linecap: round; }
+.trail { fill: none; stroke: var(--path); stroke-width: 26; stroke-linecap: round; }
+.trail-dots { fill: none; stroke: var(--path-edge); stroke-width: 3; stroke-linecap: round; stroke-dasharray: 0.1 16; opacity: 0.7; }
+.node circle.disc { fill: var(--surface); stroke: var(--line); stroke-width: 3; }
+.node.done circle.disc { stroke: var(--gold); stroke-width: 4; }
+.node.next circle.disc { stroke: var(--accent); stroke-width: 4; }
+.node.next .ring { fill: none; stroke: var(--accent); stroke-width: 3; animation: ring 1.6s ease-out infinite; transform-box: fill-box; transform-origin: center; }
+@keyframes ring { from { transform: scale(1); opacity: 0.9; } to { transform: scale(1.7); opacity: 0; } }
+.node.later { opacity: 0.6; }
+.node text { font: 700 14px var(--font-display); fill: var(--ink); paint-order: stroke; stroke: var(--grass); stroke-width: 5px; stroke-linejoin: round; }
+.walker { transition: none; }
+.flame { transform-box: fill-box; transform-origin: center bottom; animation: flicker 0.5s ease-in-out infinite alternate; }
+@keyframes flicker { from { transform: scale(1, 1) rotate(-4deg); } to { transform: scale(0.9, 1.12) rotate(4deg); } }
+.twinkle { animation: twinkle 3.2s ease-in-out infinite; }
+@keyframes twinkle { 0%,100% { opacity: 0.9; } 50% { opacity: 0.25; } }
+.zz { font: 700 13px var(--font-display); fill: var(--moon); stroke: none !important; animation: zz 2.4s ease-in-out infinite; }
+@keyframes zz { 0%,100% { transform: translateY(0); opacity: 1; } 50% { transform: translateY(-4px); opacity: 0.5; } }
+.talk .zzz { font: 700 1.3rem var(--font-display); color: var(--moon); align-self: flex-start; animation: zz 2.4s ease-in-out infinite; }
+.walker.bob use { animation: bob 0.36s ease-in-out infinite alternate; }
+@keyframes bob { from { transform: translateY(0); } to { transform: translateY(-5px); } }
+
+/* Panel */
+.panel {
+  background: var(--surface); border: 2px solid var(--line); border-radius: 28px; padding: 18px;
+  display: flex; flex-direction: column; gap: 14px; min-width: 0;
+}
+.where { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
+.where .label { font-size: 0.8rem; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+.where .name { font: 700 1.5rem/1.1 var(--font-display); }
+.pips { display: flex; gap: 6px; }
+.pips svg { width: 26px; height: 26px; }
+.pips .off { opacity: 0.25; }
+.talk { display: flex; align-items: center; gap: 10px; }
+.talk .mini { width: 70px; height: 74px; flex: none; transform-origin: 50% 100%; }
+.bubble {
+  flex: 1; min-width: 0; background: var(--bg); border-radius: 18px; padding: 12px 16px;
+  font: 600 clamp(1.25rem, 3.2vw, 1.6rem)/1.2 var(--font-display); text-wrap: balance; min-height: 2.9em;
+  display: flex; align-items: center;
+}
+.bubble.good { color: var(--good); }
+.bubble.try { color: var(--try); }
+.hop { animation: hop 0.7s ease-out 2; }
+.think { animation: think 0.9s ease-in-out 1; }
+@keyframes hop { 0%,100% { transform: translateY(0) scale(1,1); } 15% { transform: scale(1.06,0.92); } 45% { transform: translateY(-16px) scale(0.96,1.05); } 75% { transform: scale(1.04,0.96); } }
+@keyframes think { 0%,100% { transform: rotate(0); } 30% { transform: rotate(-7deg); } 70% { transform: rotate(6deg); } }
+
+.sum { font: 700 clamp(2.8rem, 9vw, 4.2rem)/1 var(--font-display); text-align: center; font-variant-numeric: tabular-nums; }
+.sum .op { color: var(--tree-deep); padding: 0 0.1em; }
+.sum .q { color: var(--accent); }
+.things { --cw: 54px; display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 10px 14px; min-height: 130px; }
+.group { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+.group .tag { font: 700 1.5rem var(--font-display); color: var(--muted); }
+.items { display: grid; grid-template-columns: repeat(var(--cols, 5), var(--cw)); gap: 8px; }
+.plus { font: 700 2.6rem var(--font-display); color: var(--tree-deep); padding-bottom: 30px; }
+.thing {
+  position: relative; width: var(--cw); height: var(--cw); padding: 0; border: 0; background: none;
+  cursor: pointer; border-radius: 12px; transition: transform 0.15s ease;
+}
+.thing svg { width: 100%; height: 100%; display: block; }
+.thing:hover:not(:disabled) { transform: translateY(-4px); }
+.thing.gone { opacity: 0.22; filter: grayscale(1); transform: translateY(-8px) scale(0.8); cursor: default; }
+.thing.gone.leave { animation: leave 0.9s ease both; }
+.thing.in { animation: popin 0.45s ease-out backwards; }
+.badge {
+  position: absolute; top: -8px; right: -6px; min-width: 24px; height: 24px; border-radius: 12px; padding: 0 4px;
+  background: var(--badge); color: var(--badge-ink); font: 800 14px/24px var(--font-body); text-align: center;
+  animation: pop 0.25s ease-out;
+}
+@keyframes pop { from { transform: scale(0.3); } to { transform: scale(1); } }
+@keyframes popin { from { transform: translateY(16px) scale(0.4); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes leave { from { opacity: 1; filter: none; transform: none; } 40% { transform: translateY(-14px) rotate(-10deg); opacity: 1; } to { opacity: 0.22; filter: grayscale(1); transform: translateY(-8px) scale(0.8); } }
+
+.choices { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.choice {
+  border: 3px solid var(--path-edge); background: var(--path); color: var(--ink); border-radius: 26px 26px 22px 22px;
+  min-height: 104px; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px;
+  box-shadow: 0 5px 0 var(--path-edge); transition: transform 0.12s ease;
+}
+.choice .num { font: 700 2.6rem/1 var(--font-display); font-variant-numeric: tabular-nums; }
+.dots { display: grid; grid-template-columns: repeat(5, 8px); gap: 4px; min-height: 8px; }
+.dots i { width: 8px; height: 8px; border-radius: 50%; background: var(--moon); }
+.choice:hover:not(:disabled) { transform: translateY(-2px); }
+.choice:active:not(:disabled) { transform: translateY(3px); box-shadow: 0 2px 0 var(--path-edge); }
+.choice:disabled { opacity: 0.3; cursor: default; }
+.choice.right { background: var(--good); border-color: var(--good); color: #fff; box-shadow: 0 5px 0 color-mix(in srgb, var(--good) 60%, var(--ink)); opacity: 1; }
+.choice.right .dots i { background: #fff; }
+.choice.glow { border-color: var(--accent); animation: glow 1s ease-in-out infinite; }
+.choice.shake { animation: shake 0.4s ease; }
+@keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-7px); } 75% { transform: translateX(7px); } }
+@keyframes glow { 0%,100% { transform: scale(1); } 50% { transform: scale(1.07); } }
+.helpers { display: flex; justify-content: center; }
+
+@media (max-width: 480px) {
+  .things { --cw: 42px; gap: 8px 8px; }
+  .items { gap: 6px; }
+  .plus { font-size: 2.1rem; }
+  .choice { min-height: 92px; }
+  .talk .mini { width: 50px; height: 55px; }
+}
+
+/* Overlays */
+.veil {
+  position: fixed; inset: 0; z-index: 20; background: var(--veil); display: grid; place-items: center;
+  padding-top: max(16px, env(safe-area-inset-top, 0px));
+  padding-bottom: max(16px, env(safe-area-inset-bottom, 0px));
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.veil[hidden] { display: none; }
+.card { display: flex; flex-direction: column; align-items: center; gap: 14px; text-align: center; max-width: 30rem; }
+.card .hero { width: 120px; height: 132px; transform-origin: 50% 100%; }
+.card .hero.big-friend { width: 156px; height: 195px; }
+.pair { display: flex; align-items: flex-end; justify-content: center; gap: 4px; }
+.card h2 { font: 700 clamp(1.9rem, 6vw, 2.7rem)/1.05 var(--font-display); margin: 0; text-wrap: balance; }
+.card p { margin: 0; color: var(--muted); font-weight: 700; font-size: 1.05rem; }
+.big {
+  font: 700 2.1rem/1 var(--font-display); color: var(--accent-ink); background: var(--accent);
+  border: 0; border-radius: 999px; padding: 18px 52px 16px; cursor: pointer;
+  box-shadow: 0 6px 0 color-mix(in srgb, var(--accent) 55%, var(--ink));
+}
+.big:active { transform: translateY(4px); box-shadow: 0 2px 0 color-mix(in srgb, var(--accent) 55%, var(--ink)); }
+.star-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; }
+.star-row svg { width: 34px; height: 34px; animation: popin 0.4s ease-out backwards; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <!-- Puddle: an original raindrop spirit -->
+  <symbol id="puddle-art" viewBox="0 0 60 66">
+    <ellipse cx="20" cy="62" rx="8" ry="3.5" fill="var(--puddle-deep)"/>
+    <ellipse cx="40" cy="62" rx="8" ry="3.5" fill="var(--puddle-deep)"/>
+    <ellipse cx="7" cy="44" rx="4.5" ry="8" transform="rotate(25 7 44)" fill="var(--puddle-deep)"/>
+    <ellipse cx="53" cy="44" rx="4.5" ry="8" transform="rotate(-25 53 44)" fill="var(--puddle-deep)"/>
+    <path d="M30 3 C38 15 54 28 54 42 A24 21 0 0 1 6 42 C6 28 22 15 30 3 Z" fill="var(--puddle)"/>
+    <path d="M17 28 C16 30 15 32 15 34" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" opacity="0.5"/>
+    <ellipse cx="30" cy="48" rx="14" ry="11" fill="var(--belly)"/>
+    <g style="opacity: var(--open, 1)">
+      <circle cx="22" cy="36" r="3.6" fill="var(--eye)"/>
+      <circle cx="38" cy="36" r="3.6" fill="var(--eye)"/>
+      <circle cx="23.3" cy="34.7" r="1.2" fill="#fff"/>
+      <circle cx="39.3" cy="34.7" r="1.2" fill="#fff"/>
+    </g>
+    <g style="opacity: var(--shut, 0)">
+      <path d="M18 36 Q22 39.5 26 36 M34 36 Q38 39.5 42 36" fill="none" stroke="var(--eye)" stroke-width="2.2" stroke-linecap="round"/>
+    </g>
+    <path d="M15 24 C17 12 26 2 40 4 C48 5 54 10 56 18 C52 15 48 15 46 17 C40 15 30 17 15 24 Z" fill="var(--nightcap)"/>
+    <path d="M22 13 C30 9 38 8 45 10 M30 7 C36 6 42 6 48 9" fill="none" stroke="var(--stripe)" stroke-width="2" opacity="0.6"/>
+    <path d="M14 25 C26 17 38 16 47 18" fill="none" stroke="var(--stripe)" stroke-width="4" stroke-linecap="round"/>
+    <circle cx="55" cy="19" r="4.5" fill="var(--stripe)"/>
+    <ellipse cx="15" cy="43" rx="4" ry="2.4" fill="var(--accent)" opacity="0.5"/>
+    <ellipse cx="45" cy="43" rx="4" ry="2.4" fill="var(--accent)" opacity="0.5"/>
+    <path d="M26 42 Q30 46 34 42" fill="none" stroke="var(--eye)" stroke-width="2.2" stroke-linecap="round"/>
+  </symbol>
+  <!-- The little dragon from the Sleepy Forest Bedtime page -->
+  <symbol id="dragon-art" viewBox="20 14 205 228">
+    <path d="M150 204 Q206 206 200 150" stroke="var(--scale)" stroke-width="20" fill="none" stroke-linecap="round"/>
+    <g class="flame"><path d="M200 104 C220 126 216 148 200 154 C184 148 180 126 200 104 Z" fill="#ff8a2a"/><path d="M200 122 C210 134 208 148 200 150 C192 148 190 134 200 122 Z" fill="#ffe066"/></g>
+    <ellipse cx="100" cy="172" rx="68" ry="62" fill="var(--scale)"/>
+    <ellipse cx="100" cy="182" rx="42" ry="46" fill="var(--tummy)"/>
+    <ellipse cx="40" cy="168" rx="13" ry="28" transform="rotate(20 40 168)" fill="var(--scale)"/>
+    <ellipse cx="160" cy="168" rx="13" ry="28" transform="rotate(-20 160 168)" fill="var(--scale)"/>
+    <ellipse cx="74" cy="228" rx="20" ry="9" fill="var(--scale)"/><ellipse cx="126" cy="228" rx="20" ry="9" fill="var(--scale)"/>
+    <g fill="#fff"><path d="M60 230 l3 6 3 -6z M68 232 l3 6 3 -6z M126 232 l3 6 3 -6z M134 230 l3 6 3 -6z"/></g>
+    <ellipse cx="100" cy="82" rx="64" ry="60" fill="var(--scale)"/>
+    <ellipse cx="66" cy="98" rx="9" ry="6" fill="#ff9f8a" opacity=".55"/><ellipse cx="134" cy="98" rx="9" ry="6" fill="#ff9f8a" opacity=".55"/>
+    <g style="opacity: var(--open, 1)">
+      <ellipse cx="78" cy="76" rx="13" ry="16" fill="#fff"/><ellipse cx="81" cy="79" rx="7" ry="10" fill="#1d2b4a"/><circle cx="84" cy="74" r="3" fill="#fff"/>
+      <ellipse cx="122" cy="76" rx="13" ry="16" fill="#fff"/><ellipse cx="119" cy="79" rx="7" ry="10" fill="#1d2b4a"/><circle cx="122" cy="74" r="3" fill="#fff"/>
+    </g>
+    <g style="opacity: var(--shut, 0)" fill="none" stroke="#2b2b2b" stroke-width="3.5" stroke-linecap="round">
+      <path d="M66 82 q12 10 24 0"/><path d="M110 82 q12 10 24 0"/>
+    </g>
+    <circle cx="94" cy="94" r="2" fill="#7a3d1e"/><circle cx="106" cy="94" r="2" fill="#7a3d1e"/>
+    <path d="M72 104 q28 20 56 0" fill="none" stroke="#2b2b2b" stroke-width="3.5" stroke-linecap="round"/>
+  </symbol>
+  <!-- Sleepy forest friends, one at each stop -->
+  <symbol id="a-mouse" viewBox="0 0 40 40"><circle cx="10" cy="12" r="8" fill="var(--mouse)"/><circle cx="30" cy="12" r="8" fill="var(--mouse)"/><circle cx="10" cy="12" r="4.5" fill="var(--pink)"/><circle cx="30" cy="12" r="4.5" fill="var(--pink)"/><ellipse cx="20" cy="25" rx="13" ry="12" fill="var(--mouse)"/><g style="opacity: var(--open, 1)"><circle cx="15" cy="23" r="2.3" fill="var(--eye)"/><circle cx="15.7" cy="22.3" r="0.8" fill="#fff"/><circle cx="25" cy="23" r="2.3" fill="var(--eye)"/><circle cx="25.7" cy="22.3" r="0.8" fill="#fff"/></g><g style="opacity: var(--shut, 0)"><path d="M12 23 Q15 25.6 18 23" fill="none" stroke="var(--eye)" stroke-width="1.8" stroke-linecap="round"/><path d="M22 23 Q25 25.6 28 23" fill="none" stroke="var(--eye)" stroke-width="1.8" stroke-linecap="round"/></g><ellipse cx="11" cy="28" rx="3" ry="1.8" fill="var(--pink)" opacity="0.7"/><ellipse cx="29" cy="28" rx="3" ry="1.8" fill="var(--pink)" opacity="0.7"/><circle cx="20" cy="29" r="2" fill="var(--pink)"/><path d="M14 30 L6 29 M14 32 L7 34 M26 30 L34 29 M26 32 L33 34" stroke="var(--eye)" stroke-width="0.9" opacity="0.6"/></symbol>
+  <symbol id="a-bunny" viewBox="0 0 40 40"><ellipse cx="14" cy="10" rx="4.5" ry="10" fill="var(--bunny)"/><ellipse cx="26" cy="10" rx="4.5" ry="10" fill="var(--bunny)"/><ellipse cx="14" cy="10" rx="2.2" ry="7" fill="var(--pink)"/><ellipse cx="26" cy="10" rx="2.2" ry="7" fill="var(--pink)"/><circle cx="20" cy="27" r="12" fill="var(--bunny)"/><g style="opacity: var(--open, 1)"><circle cx="15.5" cy="25" r="2.3" fill="var(--eye)"/><circle cx="16.2" cy="24.3" r="0.8" fill="#fff"/><circle cx="24.5" cy="25" r="2.3" fill="var(--eye)"/><circle cx="25.2" cy="24.3" r="0.8" fill="#fff"/></g><g style="opacity: var(--shut, 0)"><path d="M12.5 25 Q15.5 27.6 18.5 25" fill="none" stroke="var(--eye)" stroke-width="1.8" stroke-linecap="round"/><path d="M21.5 25 Q24.5 27.6 27.5 25" fill="none" stroke="var(--eye)" stroke-width="1.8" stroke-linecap="round"/></g><ellipse cx="12" cy="30" rx="3" ry="1.8" fill="var(--pink)" opacity="0.7"/><ellipse cx="28" cy="30" rx="3" ry="1.8" fill="var(--pink)" opacity="0.7"/><path d="M18.5 29 L21.5 29 L20 31 Z" fill="var(--pink)"/><path d="M20 31 Q18 33.5 16.5 32.5 M20 31 Q22 33.5 23.5 32.5" fill="none" stroke="var(--eye)" stroke-width="1"/></symbol>
+  <symbol id="a-frog" viewBox="0 0 40 40"><circle cx="12" cy="15" r="6.5" fill="var(--frog)"/><circle cx="28" cy="15" r="6.5" fill="var(--frog)"/><ellipse cx="20" cy="26" rx="16" ry="11" fill="var(--frog)"/><g style="opacity: var(--open, 1)"><circle cx="12" cy="15" r="3.6" fill="#fff"/><circle cx="12" cy="15" r="1.9" fill="var(--eye)"/><circle cx="28" cy="15" r="3.6" fill="#fff"/><circle cx="28" cy="15" r="1.9" fill="var(--eye)"/></g><g style="opacity: var(--shut, 0)"><path d="M9 15 Q12 17.6 15 15" fill="none" stroke="var(--eye)" stroke-width="1.8" stroke-linecap="round"/><path d="M25 15 Q28 17.6 31 15" fill="none" stroke="var(--eye)" stroke-width="1.8" stroke-linecap="round"/></g><ellipse cx="9" cy="28" rx="3" ry="1.8" fill="var(--pink)" opacity="0.7"/><ellipse cx="31" cy="28" rx="3" ry="1.8" fill="var(--pink)" opacity="0.7"/><path d="M13 28 Q20 33 27 28" fill="none" stroke="var(--eye)" stroke-width="1.6" stroke-linecap="round"/></symbol>
+  <symbol id="a-hedgehog" viewBox="0 0 40 40"><path d="M5 30 L3 22 L8 22 L6 14 L12 16 L12 8 L17 12 L20 5 L23 12 L28 8 L28 16 L34 14 L32 22 L37 22 L35 30 Z" fill="var(--hog)"/><ellipse cx="20" cy="27" rx="12" ry="9" fill="var(--face)"/><g style="opacity: var(--open, 1)"><circle cx="16" cy="25" r="2.3" fill="var(--eye)"/><circle cx="16.7" cy="24.3" r="0.8" fill="#fff"/><circle cx="24" cy="25" r="2.3" fill="var(--eye)"/><circle cx="24.7" cy="24.3" r="0.8" fill="#fff"/></g><g style="opacity: var(--shut, 0)"><path d="M13 25 Q16 27.6 19 25" fill="none" stroke="var(--eye)" stroke-width="1.8" stroke-linecap="round"/><path d="M21 25 Q24 27.6 27 25" fill="none" stroke="var(--eye)" stroke-width="1.8" stroke-linecap="round"/></g><ellipse cx="12" cy="29" rx="3" ry="1.8" fill="var(--pink)" opacity="0.7"/><ellipse cx="28" cy="29" rx="3" ry="1.8" fill="var(--pink)" opacity="0.7"/><circle cx="20" cy="29.5" r="2" fill="var(--eye)"/></symbol>
+  <symbol id="a-owl" viewBox="0 0 40 40"><path d="M7 10 L12 6 L13 13 Z M33 10 L28 6 L27 13 Z" fill="var(--owl)"/><ellipse cx="20" cy="22" rx="15" ry="16" fill="var(--owl)"/><ellipse cx="20" cy="30" rx="8" ry="7" fill="var(--face)" opacity="0.6"/><circle cx="14" cy="19" r="6.5" fill="var(--face)"/><circle cx="26" cy="19" r="6.5" fill="var(--face)"/><g style="opacity: var(--open, 1)"><circle cx="14" cy="19" r="2.6" fill="var(--eye)"/><circle cx="14.7" cy="18.3" r="0.8" fill="#fff"/><circle cx="26" cy="19" r="2.6" fill="var(--eye)"/><circle cx="26.7" cy="18.3" r="0.8" fill="#fff"/></g><g style="opacity: var(--shut, 0)"><path d="M11 19 Q14 21.6 17 19" fill="none" stroke="var(--eye)" stroke-width="1.8" stroke-linecap="round"/><path d="M23 19 Q26 21.6 29 19" fill="none" stroke="var(--eye)" stroke-width="1.8" stroke-linecap="round"/></g><path d="M18.5 23 L21.5 23 L20 26.5 Z" fill="var(--gold)"/></symbol>
+  <symbol id="a-fox" viewBox="0 0 40 40"><path d="M5 6 L15 13 L8 19 Z M35 6 L25 13 L32 19 Z" fill="var(--fox)"/><path d="M6.5 8 L11 12 L8 14 Z M33.5 8 L29 12 L32 14 Z" fill="var(--eye)" opacity="0.7"/><path d="M6 15 C6 10 34 10 34 15 C34 24 26 33 20 35 C14 33 6 24 6 15 Z" fill="var(--fox)"/><path d="M8 20 C12 22 17 26 20 35 C14 33 9 27 8 20 Z M32 20 C28 22 23 26 20 35 C26 33 31 27 32 20 Z" fill="var(--cream)"/><g style="opacity: var(--open, 1)"><circle cx="14.5" cy="20" r="2.3" fill="var(--eye)"/><circle cx="15.2" cy="19.3" r="0.8" fill="#fff"/><circle cx="25.5" cy="20" r="2.3" fill="var(--eye)"/><circle cx="26.2" cy="19.3" r="0.8" fill="#fff"/></g><g style="opacity: var(--shut, 0)"><path d="M11.5 20 Q14.5 22.6 17.5 20" fill="none" stroke="var(--eye)" stroke-width="1.8" stroke-linecap="round"/><path d="M22.5 20 Q25.5 22.6 28.5 20" fill="none" stroke="var(--eye)" stroke-width="1.8" stroke-linecap="round"/></g><circle cx="20" cy="33" r="2" fill="var(--eye)"/></symbol>
+  <symbol id="a-bear" viewBox="0 0 40 40"><circle cx="10" cy="11" r="6" fill="var(--bear)"/><circle cx="30" cy="11" r="6" fill="var(--bear)"/><circle cx="10" cy="11" r="3" fill="var(--face)"/><circle cx="30" cy="11" r="3" fill="var(--face)"/><circle cx="20" cy="23" r="14" fill="var(--bear)"/><ellipse cx="20" cy="29" rx="6.5" ry="5" fill="var(--face)"/><g style="opacity: var(--open, 1)"><circle cx="14" cy="21" r="2.3" fill="var(--eye)"/><circle cx="14.7" cy="20.3" r="0.8" fill="#fff"/><circle cx="26" cy="21" r="2.3" fill="var(--eye)"/><circle cx="26.7" cy="20.3" r="0.8" fill="#fff"/></g><g style="opacity: var(--shut, 0)"><path d="M11 21 Q14 23.6 17 21" fill="none" stroke="var(--eye)" stroke-width="1.8" stroke-linecap="round"/><path d="M23 21 Q26 23.6 29 21" fill="none" stroke="var(--eye)" stroke-width="1.8" stroke-linecap="round"/></g><ellipse cx="20" cy="27" rx="2.4" ry="1.7" fill="var(--eye)"/><path d="M18 30 Q20 32 22 30" fill="none" stroke="var(--eye)" stroke-width="1.2" stroke-linecap="round"/></symbol>
+  <!-- Fernby: an original forest guardian who waits at home -->
+  <symbol id="guardian-art" viewBox="0 0 120 150">
+    <path d="M92 124 C118 124 122 96 106 90 C96 87 92 100 101 103" fill="none" stroke="var(--fern)" stroke-width="6" stroke-linecap="round"/>
+    <path d="M100 121 l8 6 M107 114 l9 3 M111 104 l9 0 M110 95 l7 -4" stroke="var(--fern)" stroke-width="3.5" stroke-linecap="round"/>
+    <ellipse cx="42" cy="143" rx="15" ry="6" fill="var(--guard-deep)"/>
+    <ellipse cx="78" cy="143" rx="15" ry="6" fill="var(--guard-deep)"/>
+    <path d="M20 40 C6 44 -2 56 2 62 C10 64 20 54 24 46 Z" fill="var(--fern)"/>
+    <path d="M100 40 C114 44 122 56 118 62 C110 64 100 54 96 46 Z" fill="var(--fern)"/>
+    <path d="M22 46 L6 59 M98 46 L114 59" stroke="var(--tree-deep)" stroke-width="1.6" stroke-linecap="round"/>
+    <path d="M60 14 C82 14 96 34 98 60 C102 92 106 118 96 132 C86 144 34 144 24 132 C14 118 18 92 22 60 C24 34 38 14 60 14 Z" fill="var(--guard)"/>
+    <circle cx="48" cy="18" r="9" fill="var(--fern)"/><circle cx="62" cy="14" r="10" fill="var(--fern)"/><circle cx="75" cy="20" r="8" fill="var(--fern)"/>
+    <circle cx="52" cy="12" r="2.6" fill="var(--petal)"/><circle cx="68" cy="10" r="2.2" fill="#fff"/><circle cx="76" cy="17" r="2.4" fill="var(--gold)"/>
+    <path d="M60 72 C78 82 82 108 60 132 C38 108 42 82 60 72 Z" fill="var(--guard-belly)"/>
+    <path d="M60 78 L60 126 M60 92 L51 85 M60 92 L69 85 M60 106 L50 98 M60 106 L70 98" stroke="var(--guard)" stroke-width="1.8" stroke-linecap="round" opacity="0.55"/>
+    <path d="M40 52 Q46 58 52 52" fill="none" stroke="var(--eye)" stroke-width="3.2" stroke-linecap="round"/>
+    <path d="M68 52 Q74 58 80 52" fill="none" stroke="var(--eye)" stroke-width="3.2" stroke-linecap="round"/>
+    <ellipse cx="36" cy="62" rx="6" ry="3.5" fill="var(--accent)" opacity="0.45"/>
+    <ellipse cx="84" cy="62" rx="6" ry="3.5" fill="var(--accent)" opacity="0.45"/>
+    <ellipse cx="60" cy="60" rx="3.4" ry="2.6" fill="var(--eye)"/>
+    <path d="M55 66 Q60 70 65 66" fill="none" stroke="var(--eye)" stroke-width="2.2" stroke-linecap="round"/>
+    <circle cx="14" cy="112" r="16" fill="var(--glow)" opacity="0.3"/>
+    <path d="M14 88 L14 98" stroke="var(--cap)" stroke-width="2.5" stroke-linecap="round"/>
+    <rect x="6" y="100" width="16" height="20" rx="7" fill="var(--glow)" stroke="var(--cap)" stroke-width="1.8"/>
+    <path d="M4 102 C5 95 23 95 24 102 Z" fill="var(--cap)"/>
+    <ellipse cx="22" cy="90" rx="9" ry="7" fill="var(--guard-deep)"/>
+    <ellipse cx="99" cy="96" rx="7" ry="14" transform="rotate(-20 99 96)" fill="var(--guard-deep)"/>
+  </symbol>
+  <symbol id="i-mushroom" viewBox="0 0 40 40">
+    <rect x="15" y="20" width="10" height="15" rx="4" fill="var(--cream)" stroke="var(--cap)" stroke-width="1.5"/>
+    <path d="M4 22 C4 10 12 5 20 5 C28 5 36 10 36 22 Z" fill="var(--red)"/>
+    <circle cx="13" cy="14" r="2.6" fill="var(--cream)"/><circle cx="24" cy="10" r="2.2" fill="var(--cream)"/><circle cx="28" cy="17" r="2.4" fill="var(--cream)"/>
+  </symbol>
+  <symbol id="i-leaf" viewBox="0 0 40 40">
+    <path d="M20 3 C33 10 35 25 20 37 C5 25 7 10 20 3 Z" fill="var(--tree)"/>
+    <path d="M20 8 L20 34 M20 17 L14 12 M20 17 L26 12 M20 25 L13 20 M20 25 L27 20" stroke="var(--tree-deep)" stroke-width="1.6" stroke-linecap="round" fill="none"/>
+  </symbol>
+  <symbol id="i-firefly" viewBox="0 0 40 40">
+    <circle cx="20" cy="24" r="14" fill="var(--glow)" opacity="0.35"/>
+    <ellipse cx="13" cy="15" rx="7" ry="4.5" transform="rotate(-30 13 15)" fill="#fff" opacity="0.8" stroke="var(--muted)" stroke-width="1"/>
+    <ellipse cx="27" cy="15" rx="7" ry="4.5" transform="rotate(30 27 15)" fill="#fff" opacity="0.8" stroke="var(--muted)" stroke-width="1"/>
+    <ellipse cx="20" cy="18" rx="5" ry="5" fill="var(--eye)"/>
+    <ellipse cx="20" cy="27" rx="6" ry="7" fill="var(--glow)"/>
+  </symbol>
+  <symbol id="i-berry" viewBox="0 0 40 40">
+    <path d="M20 9 C22 5 26 4 30 5 C28 9 24 10 20 9 Z" fill="var(--tree)"/>
+    <circle cx="14" cy="18" r="7" fill="var(--berry)"/><circle cx="26" cy="18" r="7" fill="var(--berry)"/><circle cx="20" cy="28" r="7.5" fill="var(--berry)"/>
+    <circle cx="12" cy="16" r="1.8" fill="#fff" opacity="0.6"/><circle cx="24" cy="16" r="1.8" fill="#fff" opacity="0.6"/><circle cx="18" cy="26" r="1.8" fill="#fff" opacity="0.6"/>
+  </symbol>
+  <symbol id="i-acorn" viewBox="0 0 40 40">
+    <ellipse cx="20" cy="24" rx="11" ry="12" fill="var(--accent)"/>
+    <path d="M7 18 C9 8 31 8 33 18 C26 15 14 15 7 18 Z" fill="var(--cap)"/>
+    <path d="M20 9 L21 4" stroke="var(--cap)" stroke-width="2.5" stroke-linecap="round"/>
+  </symbol>
+  <symbol id="i-flower" viewBox="0 0 40 40">
+    <circle cx="20" cy="10" r="7" fill="var(--petal)"/><circle cx="30" cy="17" r="7" fill="var(--petal)"/><circle cx="26" cy="29" r="7" fill="var(--petal)"/>
+    <circle cx="14" cy="29" r="7" fill="var(--petal)"/><circle cx="10" cy="17" r="7" fill="var(--petal)"/>
+    <circle cx="20" cy="20" r="6" fill="var(--gold)"/>
+  </symbol>
+  <symbol id="i-star" viewBox="0 0 40 40">
+    <path d="M20 3 L25 14 L37 15 L28 23 L31 35 L20 29 L9 35 L12 23 L3 15 L15 14 Z" fill="var(--gold)" stroke="var(--cap)" stroke-width="1.2" stroke-linejoin="round"/>
+  </symbol>
+  <symbol id="i-apple" viewBox="0 0 40 40">
+    <path d="M20 12 C14 7 5 10 5 21 C5 31 12 37 20 34 C28 37 35 31 35 21 C35 10 26 7 20 12 Z" fill="var(--red)"/>
+    <path d="M20 12 L21 5" stroke="var(--cap)" stroke-width="2.5" stroke-linecap="round"/>
+    <path d="M22 8 C25 4 30 4 32 6 C29 9 25 9 22 8 Z" fill="var(--tree)"/>
+    <ellipse cx="12" cy="18" rx="2.5" ry="4" fill="#fff" opacity="0.35"/>
+  </symbol>
+  <symbol id="i-home" viewBox="0 0 40 40">
+    <path d="M6 20 L20 7 L34 20 Z" fill="var(--red)"/>
+    <rect x="10" y="19" width="20" height="16" rx="2" fill="var(--cream)" stroke="var(--cap)" stroke-width="1.5"/>
+    <rect x="17" y="25" width="7" height="10" rx="3" fill="var(--cap)"/>
+  </symbol>
+  <symbol id="i-tree" viewBox="0 0 40 50">
+    <rect x="17" y="34" width="6" height="14" rx="2" fill="var(--trunk)"/>
+    <circle cx="20" cy="22" r="15" fill="var(--tree)"/>
+    <circle cx="12" cy="30" r="9" fill="var(--tree-deep)"/>
+    <circle cx="28" cy="29" r="10" fill="var(--tree-deep)"/>
+  </symbol>
+</svg>
+
+<div class="veil" id="start">
+  <div class="card">
+    <div class="pair">
+      <svg class="hero" viewBox="20 14 205 228" aria-hidden="true"><use href="#dragon-art"/></svg>
+      <svg class="hero big-friend" viewBox="0 0 120 150" aria-hidden="true"><use href="#guardian-art"/></svg>
+    </div>
+    <h2>Little Dragon's Bedtime Path</h2>
+    <p>It's bedtime in the forest, but the forest friends can't sleep. Solve their sums to help them drift off, and walk Little Dragon home to Fernby!</p>
+    <button type="button" class="big" id="play">Play</button>
+  </div>
+</div>
+
+<div class="veil" id="finish" hidden>
+  <div class="card">
+    <div class="pair">
+      <svg class="hero" id="finish-hero" viewBox="20 14 205 228" aria-hidden="true"><use href="#dragon-art"/></svg>
+      <svg class="hero big-friend" id="finish-friend" viewBox="0 0 120 150" aria-hidden="true"><use href="#guardian-art"/></svg>
+    </div>
+    <h2>Goodnight, forest!</h2>
+    <div class="star-row" id="finish-stars"></div>
+    <p>Little Dragon is home with Fernby, and every forest friend is fast asleep. You found all 8 stars. Sweet dreams!</p>
+    <button type="button" class="big" id="again">Play again</button>
+  </div>
+</div>
+
+<div class="wrap">
+  <header class="top">
+    <h1>Little Dragon's Bedtime Path</h1>
+    <div class="controls">
+      <button type="button" class="chip" id="restart">Start over</button>
+      <button type="button" class="icon-btn" id="music" aria-pressed="false" aria-label="Music">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M9 18V5l11-2v13"/><circle cx="6" cy="18" r="3" fill="currentColor"/><circle cx="17" cy="16" r="3" fill="currentColor"/>
+          <path class="slash" d="M3 3l18 18"/>
+        </svg>
+      </button>
+      <button type="button" class="icon-btn" id="voice" aria-pressed="false" aria-label="Voice">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M4 9h4l5-4v14l-5-4H4z" fill="currentColor"/><path d="M16.5 8.5a5 5 0 0 1 0 7"/><path d="M19 6a8.5 8.5 0 0 1 0 12"/>
+          <path class="slash" d="M3 3l18 18"/>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <main class="stage">
+    <section class="map" id="mapbox" aria-label="Forest map">
+      <svg id="map" viewBox="0 0 400 600" preserveAspectRatio="xMidYMid meet" role="img" aria-label="A moonlit forest trail with 8 sleepy friends"></svg>
+    </section>
+
+    <section class="panel" id="panel" aria-label="Sum">
+      <div class="where">
+        <div><div class="label" id="where-label">Next stop</div><div class="name" id="where-name"></div></div>
+        <div class="pips" id="pips" aria-label="Sums solved here"></div>
+      </div>
+      <div class="talk">
+        <svg class="mini" id="mini" viewBox="0 0 40 40" aria-hidden="true"><use id="mini-use" href="#a-mouse"/></svg>
+        <div class="bubble" id="bubble" aria-live="polite">Yawn... it's bedtime.</div>
+        <span class="zzz" id="zzz" hidden>z z</span>
+      </div>
+      <div class="sum" id="sum"></div>
+      <div class="things" id="things"></div>
+      <div class="choices" id="choices" role="group" aria-label="Answers"></div>
+      <div class="helpers"><button type="button" class="chip" id="count">Count with me</button></div>
+    </section>
+  </main>
+</div>
+
+<script>
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+
+  // ---------- the trail ----------
+  var PLACES = [
+    { name: "Mushroom Ring", friend: "Mouse", art: "a-mouse", icon: "mushroom", one: "mushroom", many: "mushrooms", away: function (n) { return "Little Dragon picks " + n + "."; } },
+    { name: "Windy Bridge", friend: "Bunny", art: "a-bunny", icon: "leaf", one: "leaf", many: "leaves", away: function (n) { return n + (n === 1 ? " leaf blows" : " leaves blow") + " away."; } },
+    { name: "Firefly Pond", friend: "Frog", art: "a-frog", icon: "firefly", one: "firefly", many: "fireflies", away: function (n) { return n + (n === 1 ? " firefly flies" : " fireflies fly") + " away."; } },
+    { name: "Berry Bush", friend: "Hedgehog", art: "a-hedgehog", icon: "berry", one: "berry", many: "berries", away: function (n) { return "Little Dragon eats " + n + "."; } },
+    { name: "Old Oak", friend: "Owl", art: "a-owl", icon: "acorn", one: "acorn", many: "acorns", away: function (n) { return n + (n === 1 ? " acorn rolls" : " acorns roll") + " away."; } },
+    { name: "Flower Meadow", friend: "Fox", art: "a-fox", icon: "flower", one: "flower", many: "flowers", away: function (n) { return "Little Dragon picks " + n + "."; } },
+    { name: "Starry Hill", friend: "Bear", art: "a-bear", icon: "star", one: "star", many: "stars", away: function (n) { return n + (n === 1 ? " star hides" : " stars hide") + " behind a cloud."; } },
+    { name: "Home Sweet Home", friend: "Fernby", art: "guardian-art", icon: "apple", one: "apple", many: "apples", away: function (n) { return "Little Dragon eats " + n + "."; } }
+  ];
+  var SUMS_PER_STOP = 2;
+  var TRAIL = "M70 560 C170 600 335 565 330 485 C325 410 75 435 78 352 C80 275 322 300 320 220 C318 148 82 170 88 100 C92 48 220 36 330 58";
+  var TREES = [[22, 470], [210, 515], [378, 395], [196, 395], [372, 300], [24, 250], [202, 236], [376, 135], [196, 125], [24, 36], [365, 560]];
+
+  var G = { stop: 0, round: 0 };
+  try {
+    var saved = JSON.parse(localStorage.getItem("puddle-path") || "{}");
+    if (typeof saved.stop === "number" && saved.stop >= 0 && saved.stop <= PLACES.length) G.stop = saved.stop;
+  } catch (e) {}
+  function save() { try { localStorage.setItem("puddle-path", JSON.stringify({ stop: G.stop })); } catch (e) {} }
+
+  var S = { op: "add", a: 0, b: 0, answer: 0, tries: 0, groups: [], badges: {}, counter: 0,
+    locked: false, counting: false, entering: false, leaving: false, timers: [], last: "", voice: false };
+
+  function rnd(lo, hi) { return lo + Math.floor(Math.random() * (hi - lo + 1)); }
+  function later(fn, ms) { S.timers.push(setTimeout(fn, ms)); }
+  function clearTimers() { S.timers.forEach(clearTimeout); S.timers = []; S.counting = false; }
+  function place() { return PLACES[Math.min(G.stop, PLACES.length - 1)]; }
+  function word(n) { var p = place(); return n === 1 ? p.one : p.many; }
+  var reduced = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  // ---------- voice ----------
+  function say(text) {
+    if (!S.voice) return;
+    try {
+      window.speechSynthesis.cancel();
+      var u = new SpeechSynthesisUtterance(text);
+      u.rate = 0.85; u.pitch = 1.3;
+      window.speechSynthesis.speak(u);
+    } catch (e) {}
+  }
+  function talk(text, tone) {
+    $("bubble").textContent = text;
+    $("bubble").className = "bubble" + (tone ? " " + tone : "");
+    say(text);
+  }
+  function animate(el, cls) {
+    el.classList.remove("hop", "think");
+    void el.getBoundingClientRect();
+    el.classList.add(cls);
+  }
+
+  // ---------- map ----------
+  var map = $("map"), pts = [], lens = [], trailEl = null, walker = null;
+  function buildMap() {
+    var h = '<rect x="0" y="0" width="400" height="600" fill="var(--grass)"/>';
+    h += '<ellipse cx="300" cy="380" rx="70" ry="26" fill="var(--grass-2)"/><ellipse cx="90" cy="200" rx="80" ry="24" fill="var(--grass-2)"/><ellipse cx="260" cy="110" rx="60" ry="18" fill="var(--grass-2)"/>';
+    h += '<ellipse cx="186" cy="320" rx="44" ry="20" fill="var(--water)"/><ellipse cx="180" cy="316" rx="18" ry="4" fill="var(--moon)" opacity="0.25"/>';
+    h += '<circle cx="230" cy="190" r="34" fill="var(--moon)" opacity="0.08"/><circle cx="230" cy="190" r="19" fill="var(--moon)"/><circle cx="239" cy="183" r="16" fill="var(--grass)"/>';
+    [[60, 300], [140, 250], [300, 140], [360, 230], [120, 470], [260, 440], [40, 120], [150, 40], [290, 330], [350, 470], [80, 560], [250, 560]].forEach(function (st, i) {
+      h += '<circle class="twinkle" style="animation-delay:' + (i * 0.37).toFixed(2) + 's" cx="' + st[0] + '" cy="' + st[1] + '" r="' + (i % 3 ? 1.6 : 2.4) + '" fill="var(--moon)"/>';
+    });
+    TREES.forEach(function (t) { h += '<use href="#i-tree" x="' + (t[0] - 20) + '" y="' + (t[1] - 25) + '" width="40" height="50"/>'; });
+    h += '<path class="trail-edge" d="' + TRAIL + '"/><path class="trail" id="trail" d="' + TRAIL + '"/><path class="trail-dots" d="' + TRAIL + '"/>';
+    h += '<g id="nodes"></g><use href="#guardian-art" x="350" y="18" width="48" height="60"><title>Fernby the forest guardian</title></use><text class="zz" x="388" y="22">z</text><g class="walker" id="walker"><use href="#dragon-art" x="-23" y="-50" width="46" height="51"/></g>';
+    map.innerHTML = h;
+    trailEl = $("trail"); walker = $("walker");
+    var total = trailEl.getTotalLength();
+    pts = []; lens = [];
+    for (var k = 0; k <= PLACES.length; k++) {
+      var L = total * k / PLACES.length;
+      lens.push(L);
+      var p = trailEl.getPointAtLength(L);
+      pts.push({ x: p.x, y: p.y });
+    }
+  }
+  // Where each label sits beside its stop (start, then the 8 places): right, left, top or bottom.
+  var LABELS = ["b", "l", "l", "r", "r", "l", "r", "b", "b"];
+  function labelAt(side, text) {
+    var x = 0, y = 5, anchor = "middle";
+    if (side === "r") { x = 30; anchor = "start"; }
+    else if (side === "l") { x = -30; anchor = "end"; }
+    else if (side === "t") { y = -32; }
+    else { y = 42; }
+    return '<text x="' + x + '" y="' + y + '" text-anchor="' + anchor + '">' + text + "</text>";
+  }
+  function renderNodes() {
+    var h = "";
+    pts.forEach(function (p, k) {
+      if (k === 0) {
+        h += '<g class="node done" transform="translate(' + p.x + " " + p.y + ')"><circle class="disc" r="13"/>' + labelAt("b", "Start").replace('y="42"', 'y="32"') + "</g>";
+        return;
+      }
+      var pl = PLACES[k - 1];
+      var state = k <= G.stop ? "done" : k === G.stop + 1 ? "next" : "later";
+      var face = k === PLACES.length
+        ? '<use href="#i-home" x="-14" y="-14" width="28" height="28"/>'
+        : '<use href="#' + pl.art + '" x="-16" y="-16" width="32" height="32"' + (state === "done" ? ' style="--open:0;--shut:1"' : "") + "/>";
+      h += '<g class="node ' + state + '" transform="translate(' + p.x + " " + p.y + ')">' +
+        (state === "next" ? '<circle class="ring" r="22"/>' : "") +
+        '<circle class="disc" r="22"/>' + face +
+        (state === "done" ? '<text class="zz" x="16" y="-16">z</text>' : "") +
+        labelAt(LABELS[k], pl.name) + "</g>";
+    });
+    $("nodes").innerHTML = h;
+  }
+  function placeWalker(L) {
+    var p = trailEl.getPointAtLength(L);
+    walker.setAttribute("transform", "translate(" + p.x.toFixed(1) + " " + p.y.toFixed(1) + ")");
+  }
+  function walk(from, to, done) {
+    if (reduced) { placeWalker(lens[to]); done(); return; }
+    var box = $("mapbox").getBoundingClientRect();
+    if (box.bottom < 80 || box.top > window.innerHeight - 80) $("mapbox").scrollIntoView({ behavior: "smooth", block: "center" });
+    var L0 = lens[from], L1 = lens[to], t0 = null, dur = 2600;
+    walker.classList.add("bob");
+    function step(ts) {
+      if (t0 === null) t0 = ts;
+      var t = Math.min(1, (ts - t0) / dur);
+      var e = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+      placeWalker(L0 + (L1 - L0) * e);
+      if (t < 1) requestAnimationFrame(step);
+      else { walker.classList.remove("bob"); done(); }
+    }
+    requestAnimationFrame(step);
+  }
+
+  // ---------- sums ----------
+  function makeSum() {
+    var i = G.stop, op;
+    if (i <= 1) op = "add";
+    else if (i <= 3) op = "sub";
+    else if (i === 4) op = "add";
+    else if (i === 5) op = "sub";
+    else op = Math.random() < 0.5 ? "add" : "sub";
+    var big = i >= 4, a, b, key = "";
+    for (var guard = 0; guard < 40; guard++) {
+      if (op === "add") {
+        if (big) { a = rnd(1, 5); b = rnd(1, 5); } else { a = rnd(1, 4); b = rnd(1, 5 - a); }
+      } else {
+        if (big) { a = rnd(4, 9); b = rnd(1, Math.min(5, a - 1)); } else { a = rnd(2, 5); b = rnd(1, a - 1); }
+      }
+      key = op + a + "," + b;
+      if (key !== S.last) break;
+    }
+    S.last = key; S.op = op; S.a = a; S.b = b; S.answer = op === "add" ? a + b : a - b;
+  }
+
+  function thing(fid, gone, badge, delay) {
+    var p = place();
+    var cls = "thing" + (gone ? " gone" + (S.leaving ? " leave" : "") : "") + (delay != null ? " in" : "");
+    return '<button type="button" class="' + cls + '" data-fid="' + fid + '"' + (gone ? " disabled" : "") +
+      (delay != null ? ' style="animation-delay:' + delay + 'ms"' : "") +
+      ' aria-label="' + p.one + (gone ? ", gone" : "") + '"><svg viewBox="0 0 40 40" aria-hidden="true"><use href="#i-' + p.icon + '"/></svg>' +
+      (badge ? '<span class="badge">' + badge + "</span>" : "") + "</button>";
+  }
+  function isUp(g, i) { return i < g.n - g.gone; }
+  function groupHTML(g, gi, tag) {
+    var h = "";
+    for (var i = 0; i < g.n; i++) {
+      var fid = gi + "-" + i;
+      h += thing(fid, !isUp(g, i), S.badges[fid], S.entering ? (gi * 5 + i) * 100 : null);
+    }
+    return '<div class="group"><div class="items" style="--cols:' + Math.max(1, Math.min(g.n, 5)) + '">' + h + "</div>" +
+      (tag != null ? '<span class="tag">' + tag + "</span>" : "") + "</div>";
+  }
+  function renderThings() {
+    var h = S.op === "add"
+      ? groupHTML(S.groups[0], 0, S.a) + '<span class="plus" aria-hidden="true">+</span>' + groupHTML(S.groups[1], 1, S.b)
+      : groupHTML(S.groups[0], 0, null);
+    $("things").innerHTML = h;
+    S.entering = false; S.leaving = false;
+  }
+  function stillHere() {
+    var list = [];
+    S.groups.forEach(function (g, gi) { for (var i = 0; i < g.n; i++) if (isUp(g, i)) list.push(gi + "-" + i); });
+    return list;
+  }
+  function renderSum(show) {
+    var sign = S.op === "add" ? "+" : "−";
+    $("sum").innerHTML = S.a + '<span class="op">' + sign + "</span>" + S.b + '<span class="op">=</span><span class="q">' + (show ? S.answer : "?") + "</span>";
+    $("sum").setAttribute("aria-label", S.a + (S.op === "add" ? " plus " : " take away ") + S.b + " equals " + (show ? S.answer : "what?"));
+  }
+  function dots(n) { var h = ""; for (var i = 0; i < n; i++) h += "<i></i>"; return '<span class="dots" aria-hidden="true">' + h + "</span>"; }
+  function renderChoices() {
+    var c = S.answer, pool = [c - 2, c - 1, c + 1, c + 2].filter(function (x) { return x >= 0 && x <= 10; });
+    pool.sort(function () { return Math.random() - 0.5; });
+    var opts = [c, pool[0], pool[1]].sort(function (x, y) { return x - y; });
+    $("choices").innerHTML = opts.map(function (n) {
+      return '<button type="button" class="choice" id="ans-' + n + '" data-n="' + n + '" aria-label="' + n + '"><span class="num">' + n + "</span>" + dots(n) + "</button>";
+    }).join("");
+  }
+  function renderPips() {
+    var h = "";
+    for (var i = 0; i < SUMS_PER_STOP; i++) h += '<svg viewBox="0 0 40 40" class="' + (i < G.round ? "" : "off") + '" aria-hidden="true"><use href="#i-star"/></svg>';
+    $("pips").innerHTML = h;
+    $("pips").setAttribute("aria-label", G.round + " of " + SUMS_PER_STOP + " sums solved here");
+  }
+  function setSpeaker(asleep) {
+    var p = place(), g = p.art === "guardian-art";
+    $("mini").setAttribute("viewBox", g ? "0 0 120 150" : "0 0 40 40");
+    $("mini-use").setAttribute("href", "#" + p.art);
+    $("mini-use").setAttribute("style", asleep ? "--open:0;--shut:1" : "");
+    $("zzz").hidden = !asleep;
+  }
+  function renderWhere() {
+    setSpeaker(false);
+    $("where-label").textContent = "Stop " + (G.stop + 1) + " of " + PLACES.length + " \u00b7 " + place().friend;
+    $("where-name").textContent = place().name;
+    renderPips();
+  }
+
+  function newSum(intro) {
+    clearTimers();
+    S.locked = false; S.badges = {}; S.counter = 0; S.tries = 0;
+    makeSum();
+    S.entering = true;
+    var home = G.stop === PLACES.length - 1;
+    var lead = intro ? (home ? "Welcome home, Little Dragon! Yawn... one last count before bed. " : "Yawn... I'm " + place().friend + ". I can't sleep yet! Count with me. ") : "";
+    if (S.op === "add") {
+      S.groups = [{ n: S.a, gone: 0 }, { n: S.b, gone: 0 }];
+      talk(lead + S.a + " " + word(S.a) + " and " + S.b + " more. How many?");
+    } else {
+      S.groups = [{ n: S.a, gone: 0 }];
+      talk(lead + "Here are " + S.a + " " + word(S.a) + ".");
+      later(function () {
+        S.groups[0].gone = S.b; S.leaving = true;
+        renderThings();
+        talk(place().away(S.b) + " How many are left?");
+      }, intro ? 3000 : 1800);
+    }
+    renderWhere();
+    renderSum(false);
+    renderThings();
+    renderChoices();
+  }
+
+  function countAlong(after) {
+    if (S.counting) return;
+    clearTimers();
+    S.counting = true; S.badges = {}; S.counter = 0;
+    renderThings();
+    var list = stillHere();
+    if (!list.length) {
+      later(function () { S.counting = false; talk("None are left. That's zero!"); if (after) after(); }, 300);
+      return;
+    }
+    talk("Let's count!");
+    list.forEach(function (fid, i) {
+      later(function () { S.badges[fid] = i + 1; S.counter = i + 1; renderThings(); say(String(i + 1)); }, 900 + 750 * i);
+    });
+    later(function () {
+      S.counting = false;
+      if (after) after(); else talk(list.length + " " + word(list.length) + "!");
+    }, 900 + 750 * list.length);
+  }
+
+  function answer(n) {
+    if (S.locked) return;
+    var btn = $("ans-" + n);
+    if (!btn || btn.disabled) return;
+    if (n === S.answer) {
+      clearTimers();
+      S.locked = true;
+      btn.classList.remove("glow"); btn.classList.add("right");
+      Array.prototype.forEach.call($("choices").children, function (b) { if (b !== btn) b.disabled = true; });
+      renderSum(true);
+      chime();
+      animate($("mini"), "hop");
+      G.round += 1;
+      renderPips();
+      var cheers = ["Yes!", "Hooray!", "Yay!", "Super!", "Well done!"];
+      var line = cheers[rnd(0, cheers.length - 1)] + " " + S.answer + "!";
+      if (G.round < SUMS_PER_STOP) {
+        talk(line, "good");
+        later(function () { newSum(false); }, 2000);
+      } else {
+        talk(line + " Thank you. Goodnight...", "good");
+        setSpeaker(true);
+        later(goNext, 2600);
+      }
+    } else {
+      S.tries += 1;
+      btn.disabled = true;
+      btn.classList.add("shake");
+      animate($("mini"), "think");
+      if (S.tries === 1) {
+        talk("Not quite. Let's count!", "try");
+        later(function () { countAlong(function () { talk("Now tap the number."); }); }, 1300);
+      } else {
+        talk("Let's count together.", "try");
+        later(function () {
+          countAlong(function () {
+            var r = $("ans-" + S.answer);
+            if (r) r.classList.add("glow");
+            talk("It's " + S.answer + "! Tap " + S.answer + ".");
+          });
+        }, 1300);
+      }
+    }
+  }
+
+  function goNext() {
+    var from = G.stop;
+    walk(from, from + 1, function () {
+      G.stop = from + 1; G.round = 0;
+      save();
+      renderNodes();
+      fanfare();
+      if (G.stop >= PLACES.length) { showFinish(); return; }
+      later(function () { newSum(true); }, 500);
+    });
+  }
+
+  function showFinish() {
+    var h = "";
+    for (var i = 0; i < PLACES.length; i++) h += '<svg viewBox="0 0 40 40" style="animation-delay:' + (i * 120) + 'ms" aria-hidden="true"><use href="#i-star"/></svg>';
+    $("finish-stars").innerHTML = h;
+    $("finish").hidden = false;
+    animate($("finish-hero"), "hop");
+    animate($("finish-friend"), "hop");
+    say("Goodnight, forest! Little Dragon is home with Fernby, and every friend is fast asleep. Sweet dreams!");
+    $("finish-hero").setAttribute("style", "--open:0;--shut:1");
+    $("again").focus({ preventScroll: true });
+  }
+  function resetGame() {
+    clearTimers();
+    G.stop = 0; G.round = 0; save();
+    renderNodes(); placeWalker(lens[0]);
+    newSum(true);
+  }
+
+  // ---------- music and sounds (an original tune, made with Web Audio) ----------
+  var M = { ctx: null, music: null, sfx: null, on: false, timer: null, step: 0, next: 0 };
+  var EIGHTH = 60 / 66 / 2;
+  var MELODY = [
+    72, null, 76, 79, 81, 79, 76, null,
+    74, null, 77, 81, 79, null, 77, 76,
+    72, 74, 76, 79, 84, null, 81, 79,
+    77, 76, 74, null, 72, null, null, null,
+    69, 72, 76, 72, 74, 77, 81, 77,
+    76, 79, 84, 79, 77, 76, 74, null,
+    72, 76, 79, 84, 81, 79, 77, 74,
+    76, null, 74, null, 72, null, null, null
+  ];
+  var BASS = [48, 50, 45, 43, 41, 48, 41, 43];
+  function freq(m) { return 440 * Math.pow(2, (m - 69) / 12); }
+  function ensureAudio() {
+    if (M.ctx) { try { M.ctx.resume(); } catch (e) {} return true; }
+    try {
+      var AC = window.AudioContext || window.webkitAudioContext;
+      M.ctx = new AC();
+      M.music = M.ctx.createGain(); M.music.gain.value = 0.22; M.music.connect(M.ctx.destination);
+      M.sfx = M.ctx.createGain(); M.sfx.gain.value = 0.5; M.sfx.connect(M.ctx.destination);
+      return true;
+    } catch (e) { M.ctx = null; return false; }
+  }
+  function tone(out, m, t, len, vol, type) {
+    var o = M.ctx.createOscillator(), g = M.ctx.createGain();
+    o.type = type; o.frequency.value = freq(m);
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(vol, t + 0.015);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + len);
+    o.connect(g); g.connect(out);
+    o.start(t); o.stop(t + len + 0.05);
+  }
+  function schedule() {
+    while (M.next < M.ctx.currentTime + 0.25) {
+      var i = M.step % MELODY.length, t = M.next;
+      if (MELODY[i] != null) {
+        tone(M.music, MELODY[i], t, 0.8, 0.2, "sine");
+        tone(M.music, MELODY[i] + 12, t, 0.3, 0.035, "triangle");
+      }
+      if (i % 4 === 0) {
+        var root = BASS[Math.floor(i / 8)];
+        tone(M.music, i % 8 === 0 ? root : root + 7, t, 1.4, 0.11, "sine");
+      }
+      M.step += 1; M.next += EIGHTH;
+    }
+  }
+  function canSfx() { return M.ctx && (M.on || S.voice); }
+  function chime() {
+    if (!canSfx()) return;
+    var t = M.ctx.currentTime + 0.02;
+    [72, 76, 79, 84].forEach(function (m, i) { tone(M.sfx, m + 12, t + i * 0.09, 0.6, 0.16, "sine"); });
+  }
+  function fanfare() {
+    if (!canSfx()) return;
+    var t = M.ctx.currentTime + 0.02;
+    [67, 72, 76, 79, 84, 88].forEach(function (m, i) { tone(M.sfx, m + 12, t + i * 0.11, 0.9, 0.15, "triangle"); });
+  }
+  function setMusic(on) {
+    clearInterval(M.timer); M.timer = null; M.on = false;
+    if (on && ensureAudio()) {
+      M.step = 0; M.next = M.ctx.currentTime + 0.1;
+      M.timer = setInterval(schedule, 80);
+      M.on = true;
+    }
+    $("music").setAttribute("aria-pressed", String(M.on));
+  }
+  function setVoice(on) {
+    S.voice = on;
+    $("voice").setAttribute("aria-pressed", String(on));
+    if (!on) { try { window.speechSynthesis.cancel(); } catch (e) {} }
+  }
+  document.addEventListener("visibilitychange", function () {
+    if (!M.ctx) return;
+    try {
+      if (document.hidden) M.ctx.suspend();
+      else { M.ctx.resume(); M.next = M.ctx.currentTime + 0.1; }
+    } catch (e) {}
+  });
+
+  // ---------- events ----------
+  $("choices").addEventListener("click", function (e) {
+    var b = e.target.closest("button");
+    if (b) answer(Number(b.dataset.n));
+  });
+  $("things").addEventListener("click", function (e) {
+    var t = e.target.closest("[data-fid]");
+    if (!t || S.counting) return;
+    var fid = t.getAttribute("data-fid");
+    if (S.badges[fid]) return;
+    S.counter += 1; S.badges[fid] = S.counter;
+    renderThings();
+    if (S.counter === stillHere().length && !S.locked) talk("You counted " + S.counter + "!");
+    else say(String(S.counter));
+  });
+  $("count").addEventListener("click", function () { countAlong(); });
+  $("music").addEventListener("click", function () { setMusic(!M.on); });
+  $("voice").addEventListener("click", function () { setVoice(!S.voice); if (S.voice) say($("bubble").textContent); });
+
+  var restartArmed = null;
+  $("restart").addEventListener("click", function () {
+    var btn = $("restart");
+    if (restartArmed) {
+      clearTimeout(restartArmed); restartArmed = null;
+      btn.textContent = "Start over"; btn.classList.remove("warn");
+      resetGame();
+      return;
+    }
+    btn.textContent = "Tap again to start over"; btn.classList.add("warn");
+    restartArmed = setTimeout(function () { restartArmed = null; btn.textContent = "Start over"; btn.classList.remove("warn"); }, 3000);
+  });
+
+  $("play").addEventListener("click", function () {
+    $("start").hidden = true;
+    setVoice(true);
+    setMusic(true);
+    if (G.stop >= PLACES.length) resetGame(); else newSum(true);
+  });
+  $("again").addEventListener("click", function () {
+    $("finish").hidden = true;
+    resetGame();
+  });
+
+  // ---------- start ----------
+  buildMap();
+  if (G.stop >= PLACES.length) G.stop = 0;
+  renderNodes();
+  placeWalker(lens[G.stop]);
+  if (G.stop > 0) $("play").textContent = "Keep going";
+  newSum(false);
+})();
+</script>

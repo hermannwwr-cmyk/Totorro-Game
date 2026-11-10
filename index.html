@@ -1,0 +1,763 @@
+<title>Mossu's Forest Sums</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@400;600;800&display=swap">
+<style>
+/* Layout: a forest clearing. Mossu and the speech bubble on the left; hands, sum and big number buttons on the right. Stacks on a phone. A Play screen comes first so one tap can turn on voice and music. */
+:root {
+  --bg: #E6EFE8;
+  --surface: #FBFDF9;
+  --ink: #1E3529;
+  --muted: #587064;
+  --line: #CCDCD0;
+  --moss: #6F9F57;
+  --moss-deep: #4C7A3B;
+  --spirit: #5A8ED3;
+  --spirit-deep: #3D6BAA;
+  --belly: #E3EDFA;
+  --eye: #1C2A21;
+  --accent: #E5833A;
+  --accent-ink: #FFFFFF;
+  --skin: #F6CFA8;
+  --skin-line: #C38955;
+  --cuff-a: #6F9F57;
+  --cuff-b: #E5833A;
+  --ghost: #93AA9C;
+  --good: #2F8752;
+  --try: #BC5236;
+  --pip: #F6ECD8;
+  --cap: #8A5A33;
+  --badge: #2F5DA8;
+  --badge-ink: #FFFFFF;
+  --veil: rgba(230, 239, 232, 0.94);
+  --font-display: "Baloo 2", "Trebuchet MS", system-ui, sans-serif;
+  --font-body: "Nunito", "Segoe UI", system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #142019; --surface: #1D2C23; --ink: #E5EFE7; --muted: #9DB4A6; --line: #2E4337;
+    --moss: #7BAE62; --moss-deep: #5A8A46; --eye: #17221B;
+    --spirit: #6FA0E2; --spirit-deep: #4A7BBD; --belly: #D7E5F6;
+    --accent: #F0964F; --accent-ink: #1A1209; --skin: #EFC39B; --skin-line: #B07A4A;
+    --cuff-a: #7BAE62; --cuff-b: #F0964F; --ghost: #5A7464; --good: #67C188; --try: #EE8466;
+    --pip: #EFE3CB; --cap: #A06B3E; --badge: #6F9BEA; --badge-ink: #0E1A2E;
+    --veil: rgba(20, 32, 25, 0.94);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #142019; --surface: #1D2C23; --ink: #E5EFE7; --muted: #9DB4A6; --line: #2E4337;
+  --moss: #7BAE62; --moss-deep: #5A8A46; --eye: #17221B;
+  --spirit: #6FA0E2; --spirit-deep: #4A7BBD; --belly: #D7E5F6;
+  --accent: #F0964F; --accent-ink: #1A1209; --skin: #EFC39B; --skin-line: #B07A4A;
+  --cuff-a: #7BAE62; --cuff-b: #F0964F; --ghost: #5A7464; --good: #67C188; --try: #EE8466;
+  --pip: #EFE3CB; --cap: #A06B3E; --badge: #6F9BEA; --badge-ink: #0E1A2E;
+  --veil: rgba(20, 32, 25, 0.94);
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 1rem;
+  line-height: 1.5;
+  padding-block: 20px 32px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.wrap { max-width: 1040px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }
+button { font-family: var(--font-body); }
+button:focus-visible { outline: 3px solid var(--badge); outline-offset: 2px; }
+
+/* Header */
+.top { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 20px; }
+.brand h1 {
+  font-family: var(--font-display); font-weight: 800; font-size: clamp(1.6rem, 4vw, 2.3rem);
+  line-height: 1.05; margin: 0; letter-spacing: -0.01em; text-wrap: balance;
+}
+.controls { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.seg { display: inline-flex; background: var(--surface); border: 2px solid var(--line); border-radius: 999px; padding: 3px; }
+.seg button {
+  font-weight: 800; font-size: 1rem; color: var(--muted); background: none; border: 0;
+  padding: 6px 14px; border-radius: 999px; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;
+}
+.seg.ops button { font-family: var(--font-display); font-size: 1.6rem; line-height: 1; padding: 6px 16px; min-width: 52px; justify-content: center; }
+.seg button[aria-pressed="true"] { background: var(--moss); color: #fff; }
+.seg svg { width: 14px; height: 14px; fill: currentColor; }
+.icon-btn {
+  width: 46px; height: 46px; border-radius: 50%; border: 2px solid var(--line); background: var(--surface);
+  color: var(--muted); display: inline-grid; place-items: center; cursor: pointer; padding: 0;
+}
+.icon-btn svg { width: 24px; height: 24px; }
+.icon-btn .slash { display: block; }
+.icon-btn[aria-pressed="true"] { color: var(--moss-deep); border-color: var(--moss); }
+.icon-btn[aria-pressed="true"] .slash { display: none; }
+
+/* Main grid */
+.stage { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 20px; align-items: start; }
+@media (max-width: 820px) { .stage { grid-template-columns: minmax(0, 1fr); } }
+
+.scene {
+  background: linear-gradient(to bottom, var(--surface) 0 72%, color-mix(in srgb, var(--moss) 22%, var(--surface)) 72% 100%);
+  border: 2px solid var(--line); border-radius: 28px; padding: 20px; position: relative; overflow: hidden;
+  display: flex; flex-direction: column; gap: 10px; min-width: 0;
+}
+.bubble {
+  background: var(--bg); border-radius: 20px; padding: 14px 18px;
+  font-family: var(--font-display); font-weight: 700; font-size: clamp(1.4rem, 3.4vw, 1.8rem); line-height: 1.2;
+  position: relative; min-height: 3.2em; display: flex; align-items: center; text-wrap: balance;
+}
+.bubble::after {
+  content: ""; position: absolute; left: 44%; bottom: -12px; width: 24px; height: 24px; background: var(--bg);
+  transform: rotate(45deg); border-radius: 4px;
+}
+.bubble.good { color: var(--good); }
+.bubble.try { color: var(--try); }
+.friends { display: flex; align-items: flex-end; justify-content: center; gap: 4px; padding-top: 8px; }
+.mossu { width: min(220px, 60%); height: auto; transform-origin: 50% 100%; }
+.pip { width: 58px; height: auto; transform-origin: 50% 100%; }
+.hop { animation: hop 0.7s ease-out 2; }
+.think { animation: think 0.9s ease-in-out 1; }
+@keyframes hop { 0%,100% { transform: translateY(0) scale(1,1); } 15% { transform: translateY(0) scale(1.06,0.92); } 45% { transform: translateY(-22px) scale(0.96,1.05); } 75% { transform: translateY(0) scale(1.04,0.96); } }
+@keyframes think { 0%,100% { transform: rotate(0); } 30% { transform: rotate(-6deg); } 70% { transform: rotate(5deg); } }
+
+.leaf { position: absolute; top: -30px; width: 26px; height: 26px; pointer-events: none; animation: fall 2.2s ease-in forwards; }
+@keyframes fall {
+  0% { transform: translate(0, 0) rotate(0deg); opacity: 1; }
+  100% { transform: translate(var(--drift), 420px) rotate(var(--spin)); opacity: 0; }
+}
+
+.basket { display: flex; flex-direction: column; gap: 6px; align-items: center; }
+.basket-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px; }
+.basket-row svg { width: 22px; height: 26px; }
+.basket-row .empty { opacity: 0.25; }
+.basket-label { font-size: 0.85rem; color: var(--muted); font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase; }
+
+/* Problem */
+.board {
+  background: var(--surface); border: 2px solid var(--line); border-radius: 28px; padding: 20px;
+  display: flex; flex-direction: column; gap: 16px; min-width: 0;
+}
+.sum {
+  font-family: var(--font-display); font-weight: 800; font-size: clamp(3rem, 10vw, 4.6rem);
+  line-height: 1; text-align: center; letter-spacing: 0.02em; font-variant-numeric: tabular-nums;
+}
+.sum .q { color: var(--accent); }
+.sum .op { color: var(--moss-deep); padding: 0 0.12em; }
+.hands { --cw: 58px; display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 10px 16px; min-height: 150px; }
+.group { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.group .tag { font-family: var(--font-display); font-weight: 800; font-size: 1.6rem; color: var(--muted); }
+.critters { display: grid; grid-template-columns: repeat(var(--cols, 5), var(--cw)); gap: 8px; justify-content: center; }
+.plus { font-family: var(--font-display); font-weight: 800; font-size: 2.8rem; color: var(--moss-deep); padding-bottom: 34px; }
+.critter {
+  position: relative; width: var(--cw); height: calc(var(--cw) * 1.17); padding: 0; border: 0; background: none;
+  cursor: pointer; border-radius: 14px; transition: transform 0.15s ease;
+}
+.critter svg { width: 100%; height: 100%; display: block; }
+.critter:hover:not(:disabled) { transform: translateY(-4px); }
+.critter.gone { opacity: 0.25; filter: grayscale(1); transform: translateY(-10px) scale(0.8); cursor: default; }
+.critter.gone.leave { animation: leave 0.9s ease both; }
+.critter.in { animation: popin 0.45s ease-out backwards; }
+.none { width: var(--cw); height: calc(var(--cw) * 1.17); border: 3px dashed var(--ghost); border-radius: 50%; }
+.badge {
+  position: absolute; top: -8px; right: -6px; min-width: 24px; height: 24px; border-radius: 12px; padding: 0 4px;
+  background: var(--badge); color: var(--badge-ink); font: 800 14px/24px var(--font-body); text-align: center;
+  animation: pop 0.25s ease-out;
+}
+@keyframes popin { from { transform: translateY(18px) scale(0.4); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes leave { from { opacity: 1; filter: none; transform: none; } 40% { transform: translateY(-14px) rotate(-8deg); opacity: 1; } to { opacity: 0.25; filter: grayscale(1); transform: translateY(-10px) scale(0.8); } }
+@keyframes pop { from { transform: scale(0.3); } to { transform: scale(1); } }
+
+.helpers { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
+.chip {
+  font-weight: 800; font-size: 1rem; color: var(--ink); background: var(--surface);
+  border: 2px solid var(--line); border-radius: 999px; padding: 8px 16px; cursor: pointer;
+}
+
+.pad { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 10px; }
+.pad button {
+  color: var(--ink); background: var(--bg); border: 2px solid var(--line); border-radius: 18px;
+  padding: 6px 0 10px; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 4px;
+  transition: transform 0.12s ease, background 0.12s ease; min-height: 84px; justify-content: center;
+}
+.pad .num { font: 800 2rem/1 var(--font-display); font-variant-numeric: tabular-nums; }
+.pad .dots { display: grid; grid-template-columns: repeat(5, 7px); gap: 3px; min-height: 7px; }
+.pad .dots i { width: 7px; height: 7px; border-radius: 50%; background: var(--spirit); }
+.pad button:hover:not(:disabled) { background: color-mix(in srgb, var(--moss) 18%, var(--bg)); }
+.pad button:active:not(:disabled) { transform: scale(0.94); }
+.pad button:disabled { opacity: 0.35; cursor: default; }
+.pad button.right { background: var(--good); border-color: var(--good); color: #fff; opacity: 1; }
+.pad button.right .dots i { background: #fff; }
+.pad button.glow { border-color: var(--accent); animation: glow 1s ease-in-out infinite; }
+.pad button.shake { animation: shake 0.4s ease; }
+@keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
+@keyframes glow { 0%,100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 60%, transparent); } 50% { box-shadow: 0 0 0 8px color-mix(in srgb, var(--accent) 0%, transparent); transform: scale(1.06); } }
+.pad .next .num { font-size: 1.8rem; }
+
+@media (max-width: 520px) {
+  .pad { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .pad.easy { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .hands { --cw: 46px; gap: 8px 10px; }
+  .critters { gap: 6px; }
+  .plus { font-size: 2.2rem; }
+}
+
+/* Play screen */
+.start {
+  position: fixed; inset: 0; z-index: 20; background: var(--veil);
+  display: grid; place-items: center;
+  padding-top: max(16px, env(safe-area-inset-top, 0px));
+  padding-bottom: max(16px, env(safe-area-inset-bottom, 0px));
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.start[hidden] { display: none; }
+.start-card { display: flex; flex-direction: column; align-items: center; gap: 14px; text-align: center; }
+.start-card svg { width: 170px; height: auto; }
+.start-card h2 { font: 800 clamp(1.8rem, 6vw, 2.6rem)/1.05 var(--font-display); margin: 0; text-wrap: balance; }
+.play {
+  font: 800 2.2rem/1 var(--font-display); color: var(--accent-ink); background: var(--accent);
+  border: 0; border-radius: 999px; padding: 18px 56px 14px; cursor: pointer;
+  box-shadow: 0 6px 0 color-mix(in srgb, var(--accent) 60%, var(--ink));
+}
+.play:active { transform: translateY(4px); box-shadow: 0 2px 0 color-mix(in srgb, var(--accent) 60%, var(--ink)); }
+.start-card p { margin: 0; color: var(--muted); font-weight: 600; }
+
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+  .leaf { display: none; }
+}
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="mossu-art" viewBox="0 0 200 222">
+    <path d="M100 52 C100 40 101 30 103 20" fill="none" stroke="var(--moss-deep)" stroke-width="4" stroke-linecap="round"/>
+    <ellipse cx="88" cy="22" rx="15" ry="8" transform="rotate(-25 88 22)" fill="var(--moss-deep)"/>
+    <ellipse cx="117" cy="16" rx="16" ry="8" transform="rotate(20 117 16)" fill="var(--moss)" stroke="var(--moss-deep)" stroke-width="2"/>
+    <ellipse cx="26" cy="146" rx="14" ry="22" transform="rotate(25 26 146)" fill="var(--spirit-deep)"/>
+    <ellipse cx="174" cy="146" rx="14" ry="22" transform="rotate(-25 174 146)" fill="var(--spirit-deep)"/>
+    <ellipse cx="72" cy="210" rx="22" ry="10" fill="var(--spirit-deep)"/>
+    <ellipse cx="128" cy="210" rx="22" ry="10" fill="var(--spirit-deep)"/>
+    <ellipse cx="100" cy="130" rx="78" ry="80" fill="var(--spirit)"/>
+    <circle cx="62" cy="70" r="7" fill="var(--spirit-deep)" opacity="0.5"/>
+    <circle cx="140" cy="64" r="5" fill="var(--spirit-deep)" opacity="0.5"/>
+    <circle cx="156" cy="96" r="4" fill="var(--spirit-deep)" opacity="0.5"/>
+    <ellipse cx="100" cy="156" rx="48" ry="46" fill="var(--belly)"/>
+    <circle cx="92" cy="150" r="4" fill="var(--spirit)" opacity="0.45"/>
+    <circle cx="110" cy="166" r="3" fill="var(--spirit)" opacity="0.45"/>
+    <circle cx="98" cy="178" r="3.5" fill="var(--spirit)" opacity="0.45"/>
+    <circle cx="72" cy="104" r="9" fill="var(--eye)"/>
+    <circle cx="128" cy="104" r="9" fill="var(--eye)"/>
+    <circle cx="75" cy="101" r="3" fill="#fff"/>
+    <circle cx="131" cy="101" r="3" fill="#fff"/>
+    <ellipse cx="56" cy="124" rx="11" ry="7" fill="var(--accent)" opacity="0.45"/>
+    <ellipse cx="144" cy="124" rx="11" ry="7" fill="var(--accent)" opacity="0.45"/>
+    <path d="M89 120 Q100 132 111 120" fill="none" stroke="var(--eye)" stroke-width="4" stroke-linecap="round"/>
+  </symbol>
+  <symbol id="pip-art" viewBox="0 0 60 72">
+    <ellipse cx="30" cy="46" rx="22" ry="22" fill="var(--pip)" stroke="var(--cap)" stroke-width="2"/>
+    <path d="M6 36 Q30 6 54 36 Q30 30 6 36 Z" fill="var(--cap)"/>
+    <path d="M30 14 Q31 8 35 6" fill="none" stroke="var(--cap)" stroke-width="3" stroke-linecap="round"/>
+    <circle cx="23" cy="47" r="3" fill="var(--eye)"/>
+    <circle cx="37" cy="47" r="3" fill="var(--eye)"/>
+    <ellipse cx="17" cy="54" rx="4" ry="2.5" fill="var(--accent)" opacity="0.4"/>
+    <ellipse cx="43" cy="54" rx="4" ry="2.5" fill="var(--accent)" opacity="0.4"/>
+    <path d="M26 55 Q30 58 34 55" fill="none" stroke="var(--eye)" stroke-width="2" stroke-linecap="round"/>
+    <ellipse cx="22" cy="70" rx="6" ry="2.5" fill="var(--cap)"/>
+    <ellipse cx="38" cy="70" rx="6" ry="2.5" fill="var(--cap)"/>
+  </symbol>
+  <symbol id="sprite-art" viewBox="0 0 60 70">
+    <path d="M30 20 C30 14 31 9 33 5" fill="none" stroke="var(--moss-deep)" stroke-width="2.5" stroke-linecap="round"/>
+    <ellipse cx="25" cy="9" rx="7" ry="3.5" transform="rotate(-25 25 9)" fill="var(--moss-deep)"/>
+    <ellipse cx="39" cy="6" rx="7.5" ry="3.5" transform="rotate(20 39 6)" fill="var(--moss)"/>
+    <ellipse cx="22" cy="67" rx="7" ry="3" fill="var(--spirit-deep)"/>
+    <ellipse cx="38" cy="67" rx="7" ry="3" fill="var(--spirit-deep)"/>
+    <ellipse cx="30" cy="44" rx="24" ry="24" fill="var(--spirit)"/>
+    <ellipse cx="30" cy="52" rx="14" ry="13" fill="var(--belly)"/>
+    <circle cx="22" cy="38" r="3.4" fill="var(--eye)"/>
+    <circle cx="38" cy="38" r="3.4" fill="var(--eye)"/>
+    <circle cx="23.2" cy="36.8" r="1.1" fill="#fff"/>
+    <circle cx="39.2" cy="36.8" r="1.1" fill="#fff"/>
+    <ellipse cx="15" cy="46" rx="4" ry="2.5" fill="var(--accent)" opacity="0.45"/>
+    <ellipse cx="45" cy="46" rx="4" ry="2.5" fill="var(--accent)" opacity="0.45"/>
+    <path d="M26 45 Q30 49 34 45" fill="none" stroke="var(--eye)" stroke-width="2" stroke-linecap="round"/>
+  </symbol>
+</svg>
+
+<div class="start" id="start">
+  <div class="start-card">
+    <svg viewBox="0 0 200 222" aria-hidden="true"><use href="#mossu-art"/></svg>
+    <h2>Mossu's Forest Sums</h2>
+    <button type="button" class="play" id="play">Play</button>
+    <p>Count Mossu's forest friends. Mossu will talk and play music.</p>
+  </div>
+</div>
+
+<div class="wrap">
+  <header class="top">
+    <div class="brand"><h1>Mossu's Forest Sums</h1></div>
+    <div class="controls">
+      <div class="seg" role="group" aria-label="Level">
+        <button type="button" id="lvl-easy" data-level="easy" aria-pressed="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l3 7h7l-5.5 4.5L18.5 21 12 16.8 5.5 21l2-7.5L2 9h7z"/></svg>Easy</button>
+        <button type="button" id="lvl-hard" data-level="hard" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l3 7h7l-5.5 4.5L18.5 21 12 16.8 5.5 21l2-7.5L2 9h7z"/></svg><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l3 7h7l-5.5 4.5L18.5 21 12 16.8 5.5 21l2-7.5L2 9h7z"/></svg>Harder</button>
+      </div>
+      <div class="seg ops" role="group" aria-label="Kind of sum">
+        <button type="button" id="mode-add" data-mode="add" aria-pressed="true" aria-label="Add">+</button>
+        <button type="button" id="mode-sub" data-mode="sub" aria-pressed="false" aria-label="Take away">&minus;</button>
+        <button type="button" id="mode-mix" data-mode="mix" aria-pressed="false" aria-label="Mix of add and take away">+&minus;</button>
+      </div>
+      <button type="button" class="icon-btn" id="music" aria-pressed="false" aria-label="Music">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M9 18V5l11-2v13"/><circle cx="6" cy="18" r="3" fill="currentColor"/><circle cx="17" cy="16" r="3" fill="currentColor"/>
+          <path class="slash" d="M3 3l18 18"/>
+        </svg>
+      </button>
+      <button type="button" class="icon-btn" id="sound" aria-pressed="false" aria-label="Mossu's voice">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M4 9h4l5-4v14l-5-4H4z" fill="currentColor"/><path d="M16.5 8.5a5 5 0 0 1 0 7"/><path d="M19 6a8.5 8.5 0 0 1 0 12"/>
+          <path class="slash" d="M3 3l18 18"/>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <main class="stage">
+    <section class="scene" id="scene" aria-label="Mossu the forest spirit">
+      <div class="bubble" id="bubble" aria-live="polite">Hi! I'm Mossu.</div>
+      <div class="friends">
+        <svg class="mossu" id="mossu" viewBox="0 0 200 222" aria-hidden="true"><use href="#mossu-art"/></svg>
+        <svg class="pip" id="pip" viewBox="0 0 60 72" aria-hidden="true">
+          <ellipse cx="30" cy="46" rx="22" ry="22" fill="var(--pip)" stroke="var(--cap)" stroke-width="2"/>
+          <path d="M6 36 Q30 6 54 36 Q30 30 6 36 Z" fill="var(--cap)"/>
+          <path d="M30 14 Q31 8 35 6" fill="none" stroke="var(--cap)" stroke-width="3" stroke-linecap="round"/>
+          <circle cx="23" cy="47" r="3" fill="var(--eye)"/>
+          <circle cx="37" cy="47" r="3" fill="var(--eye)"/>
+          <path d="M26 55 Q30 58 34 55" fill="none" stroke="var(--eye)" stroke-width="2" stroke-linecap="round"/>
+          <ellipse cx="22" cy="70" rx="6" ry="2.5" fill="var(--cap)"/>
+          <ellipse cx="38" cy="70" rx="6" ry="2.5" fill="var(--cap)"/>
+        </svg>
+      </div>
+      <div class="basket">
+        <div class="basket-label" id="basket-label">Acorns</div>
+        <div class="basket-row" id="basket"></div>
+      </div>
+    </section>
+
+    <section class="board" aria-label="Sum">
+      <div class="sum" id="sum"></div>
+      <div class="hands" id="hands"></div>
+      <div class="helpers">
+        <button type="button" class="chip" id="count">Count with me</button>
+        <button type="button" class="chip" id="skip">New sum</button>
+      </div>
+      <div class="pad" id="pad" role="group" aria-label="Answers"></div>
+    </section>
+  </main>
+</div>
+
+<script>
+(function () {
+  // ---------- state ----------
+  var S = {
+    level: "easy", mode: "add", op: "add", a: 0, b: 0, answer: 0, tries: 0,
+    hands: [], badges: {}, counter: 0, locked: false, counting: false,
+    acorns: 0, baskets: 0, sound: false, timers: [], last: ""
+  };
+  try {
+    var saved = JSON.parse(localStorage.getItem("mossu-sums") || "{}");
+    if (typeof saved.acorns === "number") S.acorns = saved.acorns;
+    if (typeof saved.baskets === "number") S.baskets = saved.baskets;
+    if (saved.mode === "add" || saved.mode === "sub" || saved.mode === "mix") S.mode = saved.mode;
+    if (saved.level === "easy" || saved.level === "hard") S.level = saved.level;
+  } catch (e) {}
+  function save() {
+    try { localStorage.setItem("mossu-sums", JSON.stringify({ acorns: S.acorns, baskets: S.baskets, mode: S.mode, level: S.level })); } catch (e) {}
+  }
+
+  var $ = function (id) { return document.getElementById(id); };
+  var bubble = $("bubble"), sumEl = $("sum"), handsEl = $("hands"), padEl = $("pad");
+  var mossu = $("mossu"), pip = $("pip"), scene = $("scene");
+
+  function rnd(lo, hi) { return lo + Math.floor(Math.random() * (hi - lo + 1)); }
+  function later(fn, ms) { S.timers.push(setTimeout(fn, ms)); }
+  function clearTimers() { S.timers.forEach(clearTimeout); S.timers = []; S.counting = false; }
+  function plural(n) { return n === 1 ? " friend" : " friends"; }
+
+  function say(text) {
+    if (!S.sound) return;
+    try {
+      window.speechSynthesis.cancel();
+      var u = new SpeechSynthesisUtterance(text);
+      u.rate = 0.85; u.pitch = 1.25;
+      window.speechSynthesis.speak(u);
+    } catch (e) {}
+  }
+  function talk(text, tone) {
+    bubble.textContent = text;
+    bubble.className = "bubble" + (tone ? " " + tone : "");
+    say(text);
+  }
+  function animate(el, cls) {
+    el.classList.remove("hop", "think");
+    void el.getBoundingClientRect();
+    el.classList.add(cls);
+  }
+
+  // ---------- counting friends ----------
+  // Sums are shown with little forest friends: acorn sprites (first number) and blue sprouts (second number).
+  function stateOf(group, i) { return i < group.n - group.gone ? "up" : "gone"; }
+  function critter(kind, fid, state, badge, delay) {
+    var art = kind === "b" ? "#sprite-art" : "#pip-art";
+    var label = kind === "b" ? "blue sprout" : "acorn sprite";
+    var cls = "critter" + (state === "gone" ? " gone" + (S.leaving ? " leave" : "") : "") + (delay != null ? " in" : "");
+    return '<button type="button" class="' + cls + '" data-fid="' + fid + '"' +
+      (state === "gone" ? " disabled" : "") +
+      (delay != null ? ' style="animation-delay:' + delay + 'ms"' : "") +
+      ' aria-label="' + label + (state === "gone" ? ", gone home" : "") + '">' +
+      '<svg viewBox="0 0 60 70" aria-hidden="true"><use href="' + art + '"/></svg>' +
+      (badge ? '<span class="badge">' + badge + "</span>" : "") + "</button>";
+  }
+  function groupHTML(group, gi, tag) {
+    var h = "";
+    for (var i = 0; i < group.n; i++) {
+      var fid = gi + "-" + i;
+      h += critter(group.kind, fid, stateOf(group, i), S.badges[fid], S.entering ? (gi * 5 + i) * 90 : null);
+    }
+    if (group.n === 0) h = '<span class="none" role="img" aria-label="nobody"></span>';
+    return '<div class="group"><div class="critters" style="--cols:' + Math.max(1, Math.min(group.n, 5)) + '">' + h + "</div>" +
+      (tag != null ? '<span class="tag">' + tag + "</span>" : "") + "</div>";
+  }
+  function renderHands() {
+    var html;
+    if (S.op === "add") html = groupHTML(S.hands[0], 0, S.a) + '<span class="plus" aria-hidden="true">+</span>' + groupHTML(S.hands[1], 1, S.b);
+    else html = groupHTML(S.hands[0], 0, null);
+    handsEl.innerHTML = html;
+    S.entering = false; S.leaving = false;
+  }
+  // Friends still here, in reading order.
+  function raisedInOrder() {
+    var list = [];
+    S.hands.forEach(function (g, gi) {
+      for (var i = 0; i < g.n; i++) if (stateOf(g, i) === "up") list.push({ fid: gi + "-" + i });
+    });
+    return list;
+  }
+
+  // ---------- sums ----------
+  function maxAnswer() { return S.level === "easy" ? 5 : 10; }
+
+  function renderSum(showAnswer) {
+    var sign = S.op === "add" ? "+" : "−";
+    sumEl.innerHTML = S.a + '<span class="op">' + sign + "</span>" + S.b + '<span class="op">=</span><span class="q">' + (showAnswer ? S.answer : "?") + "</span>";
+    sumEl.setAttribute("aria-label", S.a + (S.op === "add" ? " plus " : " take away ") + S.b + " equals " + (showAnswer ? S.answer : "what?"));
+  }
+
+  function dots(n) {
+    var h = "";
+    for (var i = 0; i < n; i++) h += "<i></i>";
+    return '<span class="dots" aria-hidden="true">' + h + "</span>";
+  }
+  function renderPad() {
+    var max = maxAnswer(), html = "";
+    for (var n = 0; n <= max; n++) {
+      html += '<button type="button" id="ans-' + n + '" data-n="' + n + '" aria-label="' + n + '"><span class="num">' + n + "</span>" + dots(n) + "</button>";
+    }
+    if (S.level === "hard") html += '<button type="button" class="next" id="ans-next" data-next="1" aria-label="Next sum"><span class="num">→</span>' + dots(0) + "</button>";
+    padEl.innerHTML = html;
+    padEl.className = "pad" + (S.level === "easy" ? " easy" : "");
+  }
+
+  function renderBasket() {
+    var filled = S.acorns % 10, html = "";
+    for (var i = 0; i < 10; i++) {
+      html += '<svg viewBox="0 0 22 26" class="' + (i < filled ? "" : "empty") + '" aria-hidden="true">' +
+        '<ellipse cx="11" cy="16" rx="8" ry="9" fill="var(--accent)"/>' +
+        '<path d="M2 11 Q11 2 20 11 Q11 9 2 11 Z" fill="var(--cap)"/>' +
+        '<path d="M11 5 L12 1" stroke="var(--cap)" stroke-width="2" stroke-linecap="round"/></svg>';
+    }
+    $("basket").innerHTML = html;
+    $("basket").setAttribute("aria-label", filled + " of 10 acorns");
+    $("basket-label").textContent = S.baskets > 0
+      ? "Acorns · " + S.baskets + (S.baskets === 1 ? " full basket" : " full baskets")
+      : "Acorns";
+  }
+
+  function newSum() {
+    clearTimers();
+    S.locked = false; S.badges = {}; S.counter = 0; S.tries = 0;
+    S.op = S.mode === "mix" ? (Math.random() < 0.5 ? "add" : "sub") : S.mode;
+    var easy = S.level === "easy", key = "";
+    for (var guard = 0; guard < 50; guard++) {
+      if (S.op === "add") {
+        S.a = easy ? rnd(0, 4) : rnd(0, 5);
+        S.b = easy ? rnd(0, 5 - S.a) : rnd(0, 5);
+        if (S.a + S.b === 0) continue;
+        S.answer = S.a + S.b;
+      } else {
+        S.a = easy ? rnd(1, 5) : rnd(1, 9);
+        S.b = rnd(0, Math.min(S.a, 5));
+        if (S.b === 0 && Math.random() < 0.8) continue;
+        S.answer = S.a - S.b;
+      }
+      key = S.op + S.a + "," + S.b;
+      if (key !== S.last) break;
+    }
+    S.last = key;
+
+    S.entering = true;
+    if (S.op === "add") {
+      S.hands = [{ n: S.a, gone: 0, kind: "a" }, { n: S.b, gone: 0, kind: "b" }];
+      talk(S.a + " and " + S.b + ". How many friends?");
+    } else {
+      S.hands = [{ n: S.a, gone: 0, kind: "a" }];
+      talk(S.a + plural(S.a) + " came to play.");
+      later(function () {
+        S.hands[0].gone = S.b; S.leaving = true;
+        renderHands();
+        talk(S.b + " went home. How many are left?");
+      }, 1600);
+    }
+    renderSum(false);
+    renderHands();
+    Array.prototype.forEach.call(padEl.querySelectorAll("button"), function (b) {
+      b.disabled = false; b.classList.remove("right", "shake", "glow");
+    });
+  }
+
+  function countAlong(after) {
+    if (S.counting) return;
+    clearTimers();
+    S.counting = true; S.badges = {}; S.counter = 0;
+    renderHands();
+    var list = raisedInOrder();
+    if (list.length === 0) {
+      later(function () {
+        S.counting = false;
+        talk("Nobody is here. That's zero!");
+        if (after) after();
+      }, 300);
+      return;
+    }
+    talk("Let's count!");
+    list.forEach(function (f, i) {
+      later(function () {
+        S.badges[f.fid] = i + 1; S.counter = i + 1;
+        renderHands();
+        say(String(i + 1));
+      }, 900 + 750 * i);
+    });
+    later(function () {
+      S.counting = false;
+      if (after) after(); else talk(list.length + plural(list.length) + "!");
+    }, 900 + 750 * list.length);
+  }
+
+  // ---------- rewards ----------
+  function leafBurst() {
+    var colors = ["var(--moss)", "var(--accent)", "var(--spirit)", "var(--moss-deep)"];
+    for (var i = 0; i < 14; i++) {
+      var el = document.createElement("span");
+      el.className = "leaf";
+      el.style.left = rnd(4, 92) + "%";
+      el.style.animationDelay = (Math.random() * 0.5).toFixed(2) + "s";
+      el.style.setProperty("--drift", rnd(-60, 60) + "px");
+      el.style.setProperty("--spin", rnd(-360, 360) + "deg");
+      el.innerHTML = '<svg viewBox="0 0 26 26" aria-hidden="true"><path d="M13 2 C22 6 24 16 13 24 C2 16 4 6 13 2 Z" fill="' + colors[i % colors.length] + '"/><path d="M13 5 L13 22" stroke="rgba(0,0,0,.25)" stroke-width="1.5"/></svg>';
+      scene.appendChild(el);
+      setTimeout(function (n) { return function () { n.remove(); }; }(el), 3000);
+    }
+  }
+
+  function answer(n) {
+    if (S.locked) return;
+    var btn = $("ans-" + n);
+    if (!btn || btn.disabled) return;
+    if (n === S.answer) {
+      clearTimers();
+      S.locked = true;
+      btn.classList.remove("glow");
+      btn.classList.add("right");
+      renderSum(true);
+      S.acorns += 1;
+      var full = S.acorns % 10 === 0;
+      if (full) S.baskets += 1;
+      save();
+      renderBasket();
+      var cheers = ["Yes!", "Hooray!", "Yay!", "Super!", "Well done!"];
+      var line = cheers[rnd(0, cheers.length - 1)] + " " + S.answer + "!";
+      talk(full ? line + " My basket is full!" : line, "good");
+      animate(mossu, "hop");
+      animate(pip, "hop");
+      leafBurst();
+      chime();
+      later(newSum, full ? 3400 : 2600);
+    } else {
+      S.tries += 1;
+      btn.disabled = true;
+      btn.classList.add("shake");
+      animate(mossu, "think");
+      if (S.tries === 1) {
+        talk("Not quite. Let's count!", "try");
+        later(function () {
+          countAlong(function () { talk(S.answer === 0 ? "Tap zero." : "Now tap the number.", ""); });
+        }, 1300);
+      } else {
+        talk("Let's count together.", "try");
+        later(function () {
+          countAlong(function () {
+            var right = $("ans-" + S.answer);
+            if (right) right.classList.add("glow");
+            talk("It's " + S.answer + "! Tap " + S.answer + ".");
+          });
+        }, 1300);
+      }
+    }
+  }
+
+  // ---------- music and sound effects (original tune, made with Web Audio) ----------
+  var M = { ctx: null, music: null, sfx: null, on: false, timer: null, step: 0, next: 0 };
+  var TEMPO = 84, EIGHTH = 60 / TEMPO / 2;
+  // MIDI notes, one per eighth note; null is a rest. Eight bars over C, Am, F, G.
+  var MELODY = [
+    76, 79, 81, 79, 76, 74, 72, null,
+    72, 76, 81, 79, 76, null, 74, null,
+    69, 72, 74, 76, 79, 76, 74, 72,
+    74, 76, 79, null, 74, 72, 74, null,
+    76, 79, 81, 84, 81, 79, 76, null,
+    72, 76, 79, 76, 74, null, 72, null,
+    69, 72, 74, 72, 69, 67, 69, 72,
+    74, null, 71, null, 72, null, null, null
+  ];
+  var BASS = [48, 45, 41, 43, 48, 45, 41, 43];
+  function freq(m) { return 440 * Math.pow(2, (m - 69) / 12); }
+  function ensureAudio() {
+    if (M.ctx) { try { M.ctx.resume(); } catch (e) {} return true; }
+    try {
+      var AC = window.AudioContext || window.webkitAudioContext;
+      M.ctx = new AC();
+      M.music = M.ctx.createGain(); M.music.gain.value = 0.3; M.music.connect(M.ctx.destination);
+      M.sfx = M.ctx.createGain(); M.sfx.gain.value = 0.5; M.sfx.connect(M.ctx.destination);
+      return true;
+    } catch (e) { M.ctx = null; return false; }
+  }
+  function pluck(out, m, t, len, vol, type) {
+    var o = M.ctx.createOscillator(), g = M.ctx.createGain();
+    o.type = type; o.frequency.value = freq(m);
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(vol, t + 0.015);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + len);
+    o.connect(g); g.connect(out);
+    o.start(t); o.stop(t + len + 0.05);
+  }
+  function schedule() {
+    while (M.next < M.ctx.currentTime + 0.25) {
+      var i = M.step % MELODY.length, t = M.next;
+      if (MELODY[i] != null) {
+        pluck(M.music, MELODY[i], t, 0.9, 0.22, "sine");
+        pluck(M.music, MELODY[i] + 12, t, 0.35, 0.04, "triangle");
+      }
+      if (i % 4 === 0) {
+        var root = BASS[Math.floor(i / 8)];
+        pluck(M.music, i % 8 === 0 ? root : root + 7, t, 1.6, 0.12, "sine");
+      }
+      M.step += 1; M.next += EIGHTH;
+    }
+  }
+  function chime() {
+    if (!M.ctx || (!M.on && !S.sound)) return;
+    var t = M.ctx.currentTime + 0.02;
+    [72, 76, 79, 84].forEach(function (m, i) { pluck(M.sfx, m + 12, t + i * 0.09, 0.6, 0.18, "sine"); });
+  }
+  function setMusic(on) {
+    if (on && ensureAudio()) {
+      clearInterval(M.timer);
+      M.step = 0; M.next = M.ctx.currentTime + 0.1;
+      M.timer = setInterval(schedule, 80);
+      M.on = true;
+    } else {
+      clearInterval(M.timer); M.timer = null; M.on = false;
+    }
+    $("music").setAttribute("aria-pressed", String(M.on));
+  }
+  function setVoice(on) {
+    S.sound = on;
+    $("sound").setAttribute("aria-pressed", String(on));
+    if (!on) { try { window.speechSynthesis.cancel(); } catch (e) {} }
+  }
+  document.addEventListener("visibilitychange", function () {
+    if (!M.ctx) return;
+    try {
+      if (document.hidden) M.ctx.suspend();
+      else { M.ctx.resume(); M.next = M.ctx.currentTime + 0.1; }
+    } catch (e) {}
+  });
+
+  // ---------- events ----------
+  padEl.addEventListener("click", function (e) {
+    var b = e.target.closest("button");
+    if (!b) return;
+    if (b.dataset.next) { newSum(); return; }
+    answer(Number(b.dataset.n));
+  });
+
+  handsEl.addEventListener("click", function (e) {
+    var f = e.target.closest("[data-fid]");
+    if (!f || S.counting) return;
+    var fid = f.getAttribute("data-fid");
+    if (S.badges[fid]) return;
+    S.counter += 1;
+    S.badges[fid] = S.counter;
+    renderHands();
+    if (S.counter === raisedInOrder().length && !S.locked) talk("You counted " + S.counter + "!");
+    else say(String(S.counter));
+  });
+
+  $("count").addEventListener("click", function () { countAlong(); });
+  $("skip").addEventListener("click", newSum);
+
+  function syncToggles() {
+    Array.prototype.forEach.call(document.querySelectorAll("[data-mode]"), function (o) {
+      o.setAttribute("aria-pressed", String(o.dataset.mode === S.mode));
+    });
+    Array.prototype.forEach.call(document.querySelectorAll("[data-level]"), function (o) {
+      o.setAttribute("aria-pressed", String(o.dataset.level === S.level));
+    });
+  }
+  Array.prototype.forEach.call(document.querySelectorAll("[data-mode]"), function (b) {
+    b.addEventListener("click", function () { S.mode = b.dataset.mode; syncToggles(); save(); newSum(); });
+  });
+  Array.prototype.forEach.call(document.querySelectorAll("[data-level]"), function (b) {
+    b.addEventListener("click", function () { S.level = b.dataset.level; syncToggles(); save(); renderPad(); newSum(); });
+  });
+
+  $("music").addEventListener("click", function () { setMusic(!M.on); });
+  $("sound").addEventListener("click", function () {
+    setVoice(!S.sound);
+    if (S.sound) say(bubble.textContent);
+  });
+
+  $("play").addEventListener("click", function () {
+    $("start").hidden = true;
+    setVoice(true);
+    setMusic(true);
+    newSum();
+    $("count").focus({ preventScroll: true });
+  });
+
+  document.addEventListener("keydown", function (e) {
+    if (e.target.closest && e.target.closest("button") && (e.key === "Enter" || e.key === " ")) return;
+    if (/^[0-9]$/.test(e.key)) answer(Number(e.key));
+  });
+
+  // ---------- start ----------
+  syncToggles();
+  renderPad();
+  renderBasket();
+  newSum();
+})();
+</script>
