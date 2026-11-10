@@ -37,8 +37,12 @@
   --berry: #9486EA;
   --gold: #F5CF5C;
   --moon: #F6EFC9;
-  --scale: #F2853A;
-  --tummy: #FBE2A0;
+  --scale: #9C8CE3;
+  --scale-deep: #7466C4;
+  --bramble: #9A6844;
+  --bramble-deep: #7A5033;
+  --bramble-cream: #EEDDBF;
+  --tummy: #F3E9FB;
   --nightcap: #7B8FE0;
   --stripe: #EAF0FA;
   --guard: #5FAABA;
@@ -207,7 +211,11 @@ button:focus-visible { outline: 3px solid var(--badge); outline-offset: 2px; }
 .veil[hidden] { display: none; }
 .card { display: flex; flex-direction: column; align-items: center; gap: 14px; text-align: center; max-width: 30rem; }
 .card .hero { width: 120px; height: 132px; transform-origin: 50% 100%; }
-.card .hero.big-friend { width: 156px; height: 195px; }
+.card .hero.big-friend { width: min(156px, 30vw); height: auto; }
+.card .hero { max-width: 28vw; height: auto; }
+.card .hero.bramble { width: min(190px, 36vw); max-width: none; height: auto; }
+.snuggle { position: relative; display: flex; }
+.snuggle .hero.tiny { position: absolute; left: 50%; bottom: 6%; width: 38%; transform: translateX(-50%); }
 .pair { display: flex; align-items: flex-end; justify-content: center; gap: 4px; }
 .card h2 { font: 700 clamp(1.9rem, 6vw, 2.7rem)/1.05 var(--font-display); margin: 0; text-wrap: balance; }
 .card p { margin: 0; color: var(--muted); font-weight: 700; font-size: 1.05rem; }
@@ -252,27 +260,61 @@ button:focus-visible { outline: 3px solid var(--badge); outline-offset: 2px; }
     <ellipse cx="45" cy="43" rx="4" ry="2.4" fill="var(--accent)" opacity="0.5"/>
     <path d="M26 42 Q30 46 34 42" fill="none" stroke="var(--eye)" stroke-width="2.2" stroke-linecap="round"/>
   </symbol>
-  <!-- The little dragon from the Sleepy Forest Bedtime page -->
-  <symbol id="dragon-art" viewBox="20 14 205 228">
-    <path d="M150 204 Q206 206 200 150" stroke="var(--scale)" stroke-width="20" fill="none" stroke-linecap="round"/>
-    <g class="flame"><path d="M200 104 C220 126 216 148 200 154 C184 148 180 126 200 104 Z" fill="#ff8a2a"/><path d="M200 122 C210 134 208 148 200 150 C192 148 190 134 200 122 Z" fill="#ffe066"/></g>
-    <ellipse cx="100" cy="172" rx="68" ry="62" fill="var(--scale)"/>
-    <ellipse cx="100" cy="182" rx="42" ry="46" fill="var(--tummy)"/>
-    <ellipse cx="40" cy="168" rx="13" ry="28" transform="rotate(20 40 168)" fill="var(--scale)"/>
-    <ellipse cx="160" cy="168" rx="13" ry="28" transform="rotate(-20 160 168)" fill="var(--scale)"/>
-    <ellipse cx="74" cy="228" rx="20" ry="9" fill="var(--scale)"/><ellipse cx="126" cy="228" rx="20" ry="9" fill="var(--scale)"/>
-    <g fill="#fff"><path d="M60 230 l3 6 3 -6z M68 232 l3 6 3 -6z M126 232 l3 6 3 -6z M134 230 l3 6 3 -6z"/></g>
-    <ellipse cx="100" cy="82" rx="64" ry="60" fill="var(--scale)"/>
-    <ellipse cx="66" cy="98" rx="9" ry="6" fill="#ff9f8a" opacity=".55"/><ellipse cx="134" cy="98" rx="9" ry="6" fill="#ff9f8a" opacity=".55"/>
+  <!-- Little Dragon: an original sleepy moon dragon -->
+  <symbol id="dragon-art" viewBox="10 4 215 238">
+    <path d="M40 140 C10 120 6 86 22 74 C28 92 38 100 50 104 Z" fill="var(--scale-deep)"/>
+    <path d="M160 140 C190 120 194 86 178 74 C172 92 162 100 150 104 Z" fill="var(--scale-deep)"/>
+    <path d="M150 204 Q206 206 202 156" stroke="var(--scale)" stroke-width="18" fill="none" stroke-linecap="round"/>
+    <circle cx="203" cy="140" r="20" fill="var(--moon)" opacity="0.25"/>
+    <path d="M196 124 A17 17 0 1 0 214 152 A13 13 0 1 1 196 124 Z" fill="var(--moon)"/>
+    <ellipse cx="100" cy="172" rx="66" ry="60" fill="var(--scale)"/>
+    <ellipse cx="100" cy="182" rx="40" ry="44" fill="var(--tummy)"/>
+    <path d="M66 160 H134 M62 176 H138 M64 192 H136 M70 208 H130" stroke="var(--scale)" stroke-width="2.5" opacity="0.35" stroke-linecap="round"/>
+    <ellipse cx="42" cy="170" rx="12" ry="26" transform="rotate(20 42 170)" fill="var(--scale-deep)"/>
+    <ellipse cx="158" cy="170" rx="12" ry="26" transform="rotate(-20 158 170)" fill="var(--scale-deep)"/>
+    <ellipse cx="74" cy="228" rx="20" ry="9" fill="var(--scale-deep)"/><ellipse cx="126" cy="228" rx="20" ry="9" fill="var(--scale-deep)"/>
+    <circle cx="66" cy="28" r="10" fill="var(--gold)"/><circle cx="134" cy="28" r="10" fill="var(--gold)"/>
+    <path d="M86 26 L94 14 L100 26 L106 14 L114 26 Z" fill="var(--scale-deep)"/>
+    <ellipse cx="100" cy="84" rx="62" ry="56" fill="var(--scale)"/>
+    <ellipse cx="62" cy="100" rx="9" ry="6" fill="var(--pink)" opacity="0.6"/><ellipse cx="138" cy="100" rx="9" ry="6" fill="var(--pink)" opacity="0.6"/>
     <g style="opacity: var(--open, 1)">
-      <ellipse cx="78" cy="76" rx="13" ry="16" fill="#fff"/><ellipse cx="81" cy="79" rx="7" ry="10" fill="#1d2b4a"/><circle cx="84" cy="74" r="3" fill="#fff"/>
-      <ellipse cx="122" cy="76" rx="13" ry="16" fill="#fff"/><ellipse cx="119" cy="79" rx="7" ry="10" fill="#1d2b4a"/><circle cx="122" cy="74" r="3" fill="#fff"/>
+      <circle cx="76" cy="82" r="7.5" fill="var(--eye)"/><circle cx="124" cy="82" r="7.5" fill="var(--eye)"/>
+      <circle cx="78.5" cy="79.5" r="2.4" fill="#fff"/><circle cx="126.5" cy="79.5" r="2.4" fill="#fff"/>
     </g>
-    <g style="opacity: var(--shut, 0)" fill="none" stroke="#2b2b2b" stroke-width="3.5" stroke-linecap="round">
-      <path d="M66 82 q12 10 24 0"/><path d="M110 82 q12 10 24 0"/>
+    <g style="opacity: var(--shut, 0)" fill="none" stroke="var(--eye)" stroke-width="3.5" stroke-linecap="round">
+      <path d="M67 83 q9 8 18 0"/><path d="M115 83 q9 8 18 0"/>
     </g>
-    <circle cx="94" cy="94" r="2" fill="#7a3d1e"/><circle cx="106" cy="94" r="2" fill="#7a3d1e"/>
-    <path d="M72 104 q28 20 56 0" fill="none" stroke="#2b2b2b" stroke-width="3.5" stroke-linecap="round"/>
+    <ellipse cx="100" cy="100" rx="16" ry="10" fill="var(--tummy)" opacity="0.7"/>
+    <circle cx="95" cy="98" r="1.8" fill="var(--scale-deep)"/><circle cx="105" cy="98" r="1.8" fill="var(--scale-deep)"/>
+    <path d="M92 106 q8 6 16 0" fill="none" stroke="var(--eye)" stroke-width="3" stroke-linecap="round"/>
+  </symbol>
+  <!-- Bramble: an original big sleepy bear-badger with a moss blanket -->
+  <symbol id="bramble-art" viewBox="0 0 160 172">
+    <ellipse cx="52" cy="163" rx="20" ry="8" fill="var(--bramble-deep)"/>
+    <ellipse cx="108" cy="163" rx="20" ry="8" fill="var(--bramble-deep)"/>
+    <ellipse cx="80" cy="110" rx="66" ry="58" fill="var(--bramble)"/>
+    <ellipse cx="80" cy="126" rx="40" ry="34" fill="var(--bramble-cream)"/>
+    <ellipse cx="18" cy="126" rx="13" ry="24" transform="rotate(18 18 126)" fill="var(--bramble-deep)"/>
+    <ellipse cx="142" cy="126" rx="13" ry="24" transform="rotate(-18 142 126)" fill="var(--bramble-deep)"/>
+    <path d="M14 92 C26 70 134 70 146 92 C144 104 132 108 124 102 C112 110 100 104 90 108 C78 102 66 110 54 104 C42 110 18 104 14 92 Z" fill="var(--fern)"/>
+    <g fill="var(--tree)"><circle cx="34" cy="94" r="5"/><circle cx="70" cy="96" r="4"/><circle cx="104" cy="94" r="5"/><circle cx="132" cy="92" r="4"/></g>
+    <circle cx="30" cy="88" r="9" fill="var(--glow)" opacity="0.28"/><rect x="28" y="88" width="4" height="7" rx="2" fill="var(--cream)"/><path d="M24 89 Q30 79 36 89 Z" fill="var(--glow)"/><circle cx="116" cy="86" r="9" fill="var(--glow)" opacity="0.28"/><rect x="114" y="86" width="4" height="7" rx="2" fill="var(--cream)"/><path d="M110 87 Q116 77 122 87 Z" fill="var(--glow)"/><circle cx="86" cy="98" r="9" fill="var(--glow)" opacity="0.28"/><rect x="84" y="98" width="4" height="7" rx="2" fill="var(--cream)"/><path d="M80 99 Q86 89 92 99 Z" fill="var(--glow)"/>
+    <circle cx="44" cy="24" r="11" fill="var(--bramble-deep)"/><circle cx="116" cy="24" r="11" fill="var(--bramble-deep)"/>
+    <circle cx="44" cy="24" r="5" fill="var(--bramble-cream)"/><circle cx="116" cy="24" r="5" fill="var(--bramble-cream)"/>
+    <ellipse cx="80" cy="56" rx="46" ry="40" fill="var(--bramble)"/>
+    <path d="M73 18 Q80 13 87 18 L93 60 Q80 68 67 60 Z" fill="var(--bramble-cream)"/>
+    <ellipse cx="80" cy="68" rx="17" ry="12" fill="var(--bramble-cream)"/>
+    <g style="opacity: var(--open, 0)">
+      <circle cx="60" cy="52" r="4.5" fill="var(--eye)"/><circle cx="100" cy="52" r="4.5" fill="var(--eye)"/>
+      <circle cx="61.5" cy="50.5" r="1.4" fill="#fff"/><circle cx="101.5" cy="50.5" r="1.4" fill="#fff"/>
+    </g>
+    <g style="opacity: var(--shut, 1)" fill="none" stroke="var(--eye)" stroke-width="3" stroke-linecap="round">
+      <path d="M54 53 Q60 58 66 53"/><path d="M94 53 Q100 58 106 53"/>
+    </g>
+    <ellipse cx="50" cy="66" rx="7" ry="4" fill="var(--pink)" opacity="0.55"/>
+    <ellipse cx="110" cy="66" rx="7" ry="4" fill="var(--pink)" opacity="0.55"/>
+    <ellipse cx="80" cy="63" rx="6" ry="4.5" fill="var(--eye)"/>
+    <path d="M74 72 Q80 77 86 72" fill="none" stroke="var(--eye)" stroke-width="2.4" stroke-linecap="round"/>
   </symbol>
   <!-- Sleepy forest friends, one at each stop -->
   <symbol id="a-mouse" viewBox="0 0 40 40"><circle cx="10" cy="12" r="8" fill="var(--mouse)"/><circle cx="30" cy="12" r="8" fill="var(--mouse)"/><circle cx="10" cy="12" r="4.5" fill="var(--pink)"/><circle cx="30" cy="12" r="4.5" fill="var(--pink)"/><ellipse cx="20" cy="25" rx="13" ry="12" fill="var(--mouse)"/><g style="opacity: var(--open, 1)"><circle cx="15" cy="23" r="2.3" fill="var(--eye)"/><circle cx="15.7" cy="22.3" r="0.8" fill="#fff"/><circle cx="25" cy="23" r="2.3" fill="var(--eye)"/><circle cx="25.7" cy="22.3" r="0.8" fill="#fff"/></g><g style="opacity: var(--shut, 0)"><path d="M12 23 Q15 25.6 18 23" fill="none" stroke="var(--eye)" stroke-width="1.8" stroke-linecap="round"/><path d="M22 23 Q25 25.6 28 23" fill="none" stroke="var(--eye)" stroke-width="1.8" stroke-linecap="round"/></g><ellipse cx="11" cy="28" rx="3" ry="1.8" fill="var(--pink)" opacity="0.7"/><ellipse cx="29" cy="28" rx="3" ry="1.8" fill="var(--pink)" opacity="0.7"/><circle cx="20" cy="29" r="2" fill="var(--pink)"/><path d="M14 30 L6 29 M14 32 L7 34 M26 30 L34 29 M26 32 L33 34" stroke="var(--eye)" stroke-width="0.9" opacity="0.6"/></symbol>
@@ -365,11 +407,12 @@ button:focus-visible { outline: 3px solid var(--badge); outline-offset: 2px; }
 <div class="veil" id="start">
   <div class="card">
     <div class="pair">
-      <svg class="hero" viewBox="20 14 205 228" aria-hidden="true"><use href="#dragon-art"/></svg>
+      <svg class="hero" viewBox="10 4 215 238" aria-hidden="true"><use href="#dragon-art"/></svg>
+      <svg class="hero bramble" viewBox="0 0 160 172" aria-hidden="true"><use href="#bramble-art"/></svg>
       <svg class="hero big-friend" viewBox="0 0 120 150" aria-hidden="true"><use href="#guardian-art"/></svg>
     </div>
     <h2>Little Dragon's Bedtime Path</h2>
-    <p>It's bedtime in the forest, but the forest friends can't sleep. Solve their sums to help them drift off, and walk Little Dragon home to Fernby!</p>
+    <p>It's bedtime in the forest, but the forest friends can't sleep. Solve their sums to help them drift off, and walk Little Dragon home to Bramble and Fernby!</p>
     <button type="button" class="big" id="play">Play</button>
   </div>
 </div>
@@ -377,12 +420,15 @@ button:focus-visible { outline: 3px solid var(--badge); outline-offset: 2px; }
 <div class="veil" id="finish" hidden>
   <div class="card">
     <div class="pair">
-      <svg class="hero" id="finish-hero" viewBox="20 14 205 228" aria-hidden="true"><use href="#dragon-art"/></svg>
+      <div class="snuggle">
+        <svg class="hero bramble" id="finish-bramble" viewBox="0 0 160 172" aria-hidden="true"><use href="#bramble-art"/></svg>
+        <svg class="hero tiny" id="finish-hero" viewBox="10 4 215 238" aria-hidden="true"><use href="#dragon-art"/></svg>
+      </div>
       <svg class="hero big-friend" id="finish-friend" viewBox="0 0 120 150" aria-hidden="true"><use href="#guardian-art"/></svg>
     </div>
     <h2>Goodnight, forest!</h2>
     <div class="star-row" id="finish-stars"></div>
-    <p>Little Dragon is home with Fernby, and every forest friend is fast asleep. You found all 8 stars. Sweet dreams!</p>
+    <p>Little Dragon is home, snuggled up on Bramble's tummy next to Fernby. Every forest friend is fast asleep. You found all 8 stars. Sweet dreams!</p>
     <button type="button" class="big" id="again">Play again</button>
   </div>
 </div>
@@ -443,7 +489,7 @@ button:focus-visible { outline: 3px solid var(--badge); outline-offset: 2px; }
     { name: "Old Oak", friend: "Owl", art: "a-owl", icon: "acorn", one: "acorn", many: "acorns", away: function (n) { return n + (n === 1 ? " acorn rolls" : " acorns roll") + " away."; } },
     { name: "Flower Meadow", friend: "Fox", art: "a-fox", icon: "flower", one: "flower", many: "flowers", away: function (n) { return "Little Dragon picks " + n + "."; } },
     { name: "Starry Hill", friend: "Bear", art: "a-bear", icon: "star", one: "star", many: "stars", away: function (n) { return n + (n === 1 ? " star hides" : " stars hide") + " behind a cloud."; } },
-    { name: "Home Sweet Home", friend: "Fernby", art: "guardian-art", icon: "apple", one: "apple", many: "apples", away: function (n) { return "Little Dragon eats " + n + "."; } }
+    { name: "Home Sweet Home", friend: "Bramble", art: "bramble-art", icon: "apple", one: "apple", many: "apples", away: function (n) { return "Little Dragon eats " + n + "."; } }
   ];
   var SUMS_PER_STOP = 2;
   var TRAIL = "M70 560 C170 600 335 565 330 485 C325 410 75 435 78 352 C80 275 322 300 320 220 C318 148 82 170 88 100 C92 48 220 36 330 58";
@@ -531,7 +577,7 @@ button:focus-visible { outline: 3px solid var(--badge); outline-offset: 2px; }
       var pl = PLACES[k - 1];
       var state = k <= G.stop ? "done" : k === G.stop + 1 ? "next" : "later";
       var face = k === PLACES.length
-        ? '<use href="#i-home" x="-14" y="-14" width="28" height="28"/>'
+        ? '<use href="#bramble-art" x="-17" y="-18" width="34" height="36" style="--open:' + (state === "done" ? 0 : 1) + ";--shut:" + (state === "done" ? 1 : 0) + '"/>'
         : '<use href="#' + pl.art + '" x="-16" y="-16" width="32" height="32"' + (state === "done" ? ' style="--open:0;--shut:1"' : "") + "/>";
       h += '<g class="node ' + state + '" transform="translate(' + p.x + " " + p.y + ')">' +
         (state === "next" ? '<circle class="ring" r="22"/>' : "") +
@@ -634,10 +680,10 @@ button:focus-visible { outline: 3px solid var(--badge); outline-offset: 2px; }
     $("pips").setAttribute("aria-label", G.round + " of " + SUMS_PER_STOP + " sums solved here");
   }
   function setSpeaker(asleep) {
-    var p = place(), g = p.art === "guardian-art";
-    $("mini").setAttribute("viewBox", g ? "0 0 120 150" : "0 0 40 40");
+    var p = place(), VB = { "guardian-art": "0 0 120 150", "bramble-art": "0 0 160 172" };
+    $("mini").setAttribute("viewBox", VB[p.art] || "0 0 40 40");
     $("mini-use").setAttribute("href", "#" + p.art);
-    $("mini-use").setAttribute("style", asleep ? "--open:0;--shut:1" : "");
+    $("mini-use").setAttribute("style", asleep ? "--open:0;--shut:1" : "--open:1;--shut:0");
     $("zzz").hidden = !asleep;
   }
   function renderWhere() {
@@ -653,7 +699,7 @@ button:focus-visible { outline: 3px solid var(--badge); outline-offset: 2px; }
     makeSum();
     S.entering = true;
     var home = G.stop === PLACES.length - 1;
-    var lead = intro ? (home ? "Welcome home, Little Dragon! Yawn... one last count before bed. " : "Yawn... I'm " + place().friend + ". I can't sleep yet! Count with me. ") : "";
+    var lead = intro ? (home ? "Welcome home, Little Dragon! I'm Bramble. Yawn... one last count, then we snuggle. " : "Yawn... I'm " + place().friend + ". I can't sleep yet! Count with me. ") : "";
     if (S.op === "add") {
       S.groups = [{ n: S.a, gone: 0 }, { n: S.b, gone: 0 }];
       talk(lead + S.a + " " + word(S.a) + " and " + S.b + " more. How many?");
@@ -756,7 +802,8 @@ button:focus-visible { outline: 3px solid var(--badge); outline-offset: 2px; }
     $("finish").hidden = false;
     animate($("finish-hero"), "hop");
     animate($("finish-friend"), "hop");
-    say("Goodnight, forest! Little Dragon is home with Fernby, and every friend is fast asleep. Sweet dreams!");
+    animate($("finish-bramble"), "hop");
+    say("Goodnight, forest! Little Dragon is snuggled up with Bramble, and every friend is fast asleep. Sweet dreams!");
     $("finish-hero").setAttribute("style", "--open:0;--shut:1");
     $("again").focus({ preventScroll: true });
   }
